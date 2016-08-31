@@ -22,7 +22,7 @@ bl_info = {
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
 	"description": "Tools for Keying",
-	"location": "Everywhere! :)"
+	"location": "Timeline header, View3D header, Dopesheet (only selected mode) header"
 }
 
 import bpy
