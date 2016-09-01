@@ -132,7 +132,7 @@ class ExportToPlace(bpy.types.Operator):
 			return{'FINISHED'}
 
 		# check fbx
-		if( not exportPath.endswith (".fbx") and not backupPath.endswith (".FBX") ):
+		if( not exportPath.endswith (".fbx") and not exportPath.endswith (".FBX") ):
 			context.scene.ExportFBX += ".fbx"
 			exportPath += ".fbx"
 			
