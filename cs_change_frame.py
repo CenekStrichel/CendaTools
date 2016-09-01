@@ -23,7 +23,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"version": (1, 0, 0),
 	"blender": (2, 77, 0),
-	"location": "view3d.change_frame_drag",
+	"location": "Add 'view3d.change_frame_drag' to Input Preferences under 3D View (Global)",
 	"description": "Change frame by dragging",
 	"category": "Cenda Tools"}
 
