@@ -23,7 +23,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"version": (1, 0, 0),
 	"blender": (2, 77, 0),
-	"location": "View 3D > Tools",
+	"location": "Tools > Bonese Renamer (Armature Edit Mode)",
 	"description": "Rename duplicated bones",
 	"category": "Cenda Tools"}
 	
@@ -33,9 +33,9 @@ import bpy
 
 class StringsGroup(bpy.types.PropertyGroup):
 	
-	bpy.types.Scene.OldName = bpy.props.StringProperty(name = "Old", default = "Back" )
-	bpy.types.Scene.NewName = bpy.props.StringProperty(name = "New", default = "Middle" )
-	bpy.types.Scene.DelName = bpy.props.StringProperty(name = "Delete", default = ".001", description = "Blank for no delete" )
+	bpy.types.Scene.OldName = bpy.props.StringProperty(name = "Find", default = "Back" )
+	bpy.types.Scene.NewName = bpy.props.StringProperty(name = "Replace", default = "Middle" )
+	bpy.types.Scene.DelName = bpy.props.StringProperty(name = "Postfix", default = ".001", description = "Postfix for delete" )
 
 
 class RenamePanel(bpy.types.Panel):
@@ -59,7 +59,7 @@ class RenamePanel(bpy.types.Panel):
 		layout.row().prop( scn, "DelName")
 		
 		# button
-		layout.operator("cenda.rename")
+		layout.operator("view3d.bone_rename")
 		
 
 # rename button	
@@ -67,7 +67,7 @@ class Rename(bpy.types.Operator):
 	
 	"""Rename selected bones"""
 	bl_label = "Rename Bones"
-	bl_idname = "cenda.rename"
+	bl_idname = "view3d.bone_rename"
 	
 
 	def execute(self, context ):
@@ -84,8 +84,9 @@ class Rename(bpy.types.Operator):
 			bone.name = bone.name.replace(oldName, newName)
 			
 			# delete
-			if(len(deleteName) > 0):	
-				bone.name = bone.name.replace(deleteName, '')
+			if(len(deleteName) > 0):
+				bone.name = bone.name [::-1].replace(deleteName[::-1], ""[::-1], 1)[::-1]	
+			#	bone.name = bone.name.split(".")[].replace(deleteName, '')
 				
 			
 		self.report({'INFO'},"All bones was renamed")
