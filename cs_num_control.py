@@ -827,8 +827,9 @@ class NumControlSelectDefault(bpy.types.Operator):
 	
 	def execute(self, context):
 		
-		ResetSetting( context )
-	
+		# reset first
+		bpy.ops.view3d.num_select_reset()
+		
 		# ANIMAL #
 		if(self.preset == 0):
 			
