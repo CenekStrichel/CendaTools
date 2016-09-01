@@ -21,6 +21,8 @@ bl_info = {
 	"name": "Numeric Selector",
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
+	"version": (1, 0, 0),
+	"blender": (2, 77, 0),
 	"description": "Selecting bones with hotkeys",
 	"location": "Hotkey"
 }
@@ -235,99 +237,137 @@ class NumControlPanel(bpy.types.Panel):
 	bpy.types.Object.Num9MSR = bpy.props.EnumProperty( name = "Manipulator", description = "", items=manipulatorsEnum )
 	bpy.types.Object.Num9AutoIKSR = bpy.props.BoolProperty( name = "Auto IK SR", description = "", default = False )
 	
+	bpy.types.Object.Initialize = bpy.props.BoolProperty( name = "Initialize", description = "", default = False )
+	
 	
 	def draw(self, context):
 		
 		layout = self.layout
 		obj = context.object
 		
-		for i in range(10) :
+		
+		# I need create some value first
+		if( obj.Initialize == False ):
 			
 			box = layout.box()
-			box.label( "Num "+str(i) )
+			c = box.column()
+			c.operator("view3d.num_select_reset", text = "Initialize")
 
-			# Normal
-			c = layout.column()
-			row = c.row()
-			split = box.split(percentage=0.47)
-			c = split.column()
-			c.prop(obj, ("Num"+str(i)), text = "Normal" )
-			
-			split = split.split( align = True )
-			c = split.column( align = True )
-			c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER').index = str(i)
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"M"), text = "" )
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"AutoIKN"), text = "Auto IK" )
-			
-			# Spare
-			split = box.split(percentage=0.47)
-			c = split.column()
-			c.prop(obj, ("Num"+str(i)+"S"), text = "Spare" )
-			
-			split = split.split(align = True)
-			c = split.column(align = True)
-			c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER').index = (str(i)+"S")
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"MS"), text = "" )
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"AutoIKS"), text = "Auto IK" )
-			
-			# Spare Repeat
-			split = box.split(percentage=0.47)
-			c = split.column()
-			c.prop(obj, ("Num"+str(i)+"SR"), text = "Spare Repeat" )
-			
-			split = split.split(align = True)
-			c = split.column(align = True)
-			c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER').index = (str(i)+"SR")
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"MSR"), text = "" )
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"AutoIKSR"), text = "Auto IK" )
-			
-			# Separator
-			c.separator()
-			c.separator()
-			
-			# Repeat
-			split = box.split(percentage=0.47)
-			c = split.column()
-			c.prop(obj, ("Num"+str(i)+"R"), text = "Repeat" )
-			
-			split = split.split(align = True)
-			c = split.column(align = True)
-			c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER').index = (str(i)+"R")
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"MR"), text = "" )
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"AutoIKR"), text = "Auto IK" )
-			
-			# Double
-			split = box.split(percentage=0.47)
-			c = split.column()
-			c.prop(obj, ("Num"+str(i)+"D"), text = "Double" )
-			
-			split = split.split(align = True)
-			c = split.column(align = True)
-			c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER').index = (str(i)+"D")
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"MD"), text = "" )
-			c = split.column(align = True)
-			c.prop(obj, ("Num"+str(i)+"AutoIKD"), text = "Auto IK" )
+		else:
 
-			# Separator
-			c.separator()
-			
-		box = layout.box()
-		box.label("Settings")	
-		split = box.split()
-		c = split.row(align = True)
-		c.operator("view3d.num_select_default", text = "Fill Default Animal").preset = 0
-		c.operator("view3d.num_select_default", text = "Fill Default Human").preset = 1
-		
+			for i in range(10) :
+				
+				box = layout.box()
+				box.label( "Num "+str(i) )
 
+				# Normal
+				c = layout.column()
+				split = box.split(percentage=0.47)
+				c = split.column()
+				c.prop(obj, ("Num"+str(i)), text = "Normal" )
+				
+				split = split.split( align = True )
+				c = split.column( align = True )
+				
+				selectFill = c.operator("view3d.num_select_fill", text="", icon = 'HAND')
+				selectFill.index = str(i)
+				selectFill.multipleSelection = True
+				
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"M"), text = "" )
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"AutoIKN"), text = "Auto IK" )
+				
+				
+				# Spare
+				split = box.split(percentage=0.47)
+				c = split.column()
+				c.prop(obj, ("Num"+str(i)+"S"), text = "Spare" )
+				
+				split = split.split(align = True)
+				c = split.column(align = True)
+				
+				selectFill = c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER')
+				selectFill.index = (str(i)+"S")
+				selectFill.multipleSelection = False
+				
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"MS"), text = "" )
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"AutoIKS"), text = "Auto IK" )
+				
+				
+				# Spare Repeat
+				split = box.split(percentage=0.47)
+				c = split.column()
+				c.prop(obj, ("Num"+str(i)+"SR"), text = "Spare Repeat" )
+				
+				split = split.split(align = True)
+				c = split.column(align = True)
+				
+				selectFill = c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER')
+				selectFill.index = (str(i)+"SR")
+				selectFill.multipleSelection = False
+				
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"MSR"), text = "" )
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"AutoIKSR"), text = "Auto IK" )
+				
+				
+				# Separator
+				c.separator()
+				c.separator()
+				
+				
+				# Repeat
+				split = box.split(percentage=0.47)
+				c = split.column()
+				c.prop(obj, ("Num"+str(i)+"R"), text = "Repeat" )
+				
+				split = split.split(align = True)
+				c = split.column(align = True)
+				
+				selectFill = c.operator("view3d.num_select_fill", text="", icon = 'EYEDROPPER')
+				selectFill.index = (str(i)+"R")
+				selectFill.multipleSelection = False
+				
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"MR"), text = "" )
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"AutoIKR"), text = "Auto IK" )
+				
+				# Double
+				split = box.split(percentage=0.47)
+				c = split.column()
+				c.prop(obj, ("Num"+str(i)+"D"), text = "Double" )
+				
+				split = split.split(align = True)
+				c = split.column(align = True)
+				
+				selectFill = c.operator("view3d.num_select_fill", text="", icon = 'HAND')
+				selectFill.index = (str(i)+"D")
+				selectFill.multipleSelection = True
+				
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"MD"), text = "" )
+				c = split.column(align = True)
+				c.prop(obj, ("Num"+str(i)+"AutoIKD"), text = "Auto IK" )
+
+				# Separator
+				c.separator()
+					
+			box = layout.box()
+			box.label("Settings")	
+			split = box.split()
+			c = split.row(align = True)
+			c.operator("view3d.num_select_default", text = "Fill Default Animal").preset = 0
+			c.operator("view3d.num_select_default", text = "Fill Default Human").preset = 1
+			
+			c = box.column()
+			c.operator("view3d.num_select_reset", text = "Clear")
+			
+			
 # selecting by num	
 class NumControlSelect(bpy.types.Operator):
 
@@ -369,55 +409,62 @@ class NumControlSelect(bpy.types.Operator):
 			
 			num = str(i)
 			
-			# NORMAL & REPEAT
-			if(self.numKey == 'Num'+num):
-			
-				repeat, spare = SelectBone(
-				self, 
-				ob, 
-				(ob["Num"+num]), 
-				(ob["Num"+num+"R"]),
-				(ob["Num"+num+"M"]), 
-				(ob["Num"+num+"MR"]), 
-				(ob["Num"+num+"S"]), 
-				(ob["Num"+num+"MS"]),
-				(ob["Num"+num+"SR"]),
-				(ob["Num"+num+"MSR"])
-				 )
-				if(spare and repeat):
-					AutoIKSetting(ob["Num"+num+"AutoIKSR"])
-				elif(spare):
-					AutoIKSetting(ob["Num"+num+"AutoIKS"])		
-				elif(repeat):
-					AutoIKSetting(ob["Num"+num+"AutoIKR"])
+			try:
+				# NORMAL & REPEAT
+				if(self.numKey == 'Num'+num):
+				
+					repeat, spare = SelectBone(
+					self, 
+					ob, 
+					(ob["Num"+num]), 
+					(ob["Num"+num+"R"]),
+					(ob["Num"+num+"M"]), 
+					(ob["Num"+num+"MR"]), 
+					(ob["Num"+num+"S"]), 
+					(ob["Num"+num+"MS"]),
+					(ob["Num"+num+"SR"]),
+					(ob["Num"+num+"MSR"])
+					 )
+					if(spare and repeat):
+						AutoIKSetting(ob["Num"+num+"AutoIKSR"])
+					elif(spare):
+						AutoIKSetting(ob["Num"+num+"AutoIKS"])		
+					elif(repeat):
+						AutoIKSetting(ob["Num"+num+"AutoIKR"])
+					else:
+						AutoIKSetting(ob["Num"+num+"AutoIKN"])
+					
+				# DOUBLE	
+				elif(self.numKey == ('Num'+num+'D') ):
+					
+					repeat, spare = SelectBone(
+					self,
+					ob,
+					(ob["Num"+num+"D"]),
+					(ob["Num"+num+"D"]),
+					(ob["Num"+num+"MD"]),
+					(ob["Num"+num+"MD"]),
+					(ob["Num"+num+"S"]),
+					(ob["Num"+num+"MS"]),
+					(ob["Num"+num+"S"]),
+					(ob["Num"+num+"MS"])
+					 )
+					
+					AutoIKSetting(ob["Num"+num+"AutoIKD"])
+					
+			except:
+				if( not ob.Initialized ):
+					self.report({'ERROR'}, "Bone selector was not Initialized\nUse Initialize in the Armature setting")
 				else:
-					AutoIKSetting(ob["Num"+num+"AutoIKN"])
+					self.report({'WARNING'}, "Bone was not found")
 				
-			# DOUBLE	
-			elif(self.numKey == ('Num'+num+'D') ):
-				
-				repeat, spare = SelectBone(
-				self,
-				ob,
-				(ob["Num"+num+"D"]),
-				(ob["Num"+num+"D"]),
-				(ob["Num"+num+"MD"]),
-				(ob["Num"+num+"MD"]),
-				(ob["Num"+num+"S"]),
-				(ob["Num"+num+"MS"]),
-				(ob["Num"+num+"S"]),
-				(ob["Num"+num+"MS"])
-				 )
-				
-				AutoIKSetting(ob["Num"+num+"AutoIKD"])
-		
-		# for AutoIK toggle		
+		# for AutoIK toggle	(my another addon)	
 		# redraw 
 		for area in bpy.context.screen.areas:
 			if area.type == 'VIEW_3D':
 				area.tag_redraw()
 				
-		return {'FINISHED'}	
+		return {'FINISHED'}
 
 		
 def AutoIKSetting( state = False ):
@@ -432,6 +479,7 @@ def SelectBone( self, ob, boneName, boneNameRepeat, manipulator, manipulatorRepe
 	finalManipulator = ""
 	repeatKey = False
 	spare = False
+
 	
 	# normal select
 	if( bpy.context.active_pose_bone.name != boneName ) :
@@ -445,8 +493,13 @@ def SelectBone( self, ob, boneName, boneNameRepeat, manipulator, manipulatorRepe
 		finalManipulator = manipulatorRepeat
 		repeatKey = True
 	
+	# contains multiple bones?
+	multipleBones = False	
+	if ";" in finalBone:
+		multipleBones = True
+	
 	# spare
-	if( finalBone != "" and ob.pose.bones[ finalBone ].bone.hide ):
+	if( not multipleBones and finalBone != "" and ob.pose.bones[ finalBone ].bone.hide ):
 		
 		if(bpy.context.active_pose_bone.name == boneSpare):
 			finalBone = boneSpareRepeat
@@ -458,21 +511,11 @@ def SelectBone( self, ob, boneName, boneNameRepeat, manipulator, manipulatorRepe
 			finalManipulator = manipulatorSpare
 			
 		spare = True
-		
-		
-		
-		
-	# contains multiple bones?
-	multipleBones = False	
-	if ";" in finalBone:
-		multipleBones = True
-	
+
 	# if bone is not exist
 	if( (ob.pose.bones.get( finalBone ) is None) and not multipleBones ):
 		
-		if( len(finalBone) > 0) :
-			self.report({'WARNING'}, finalBone + " was not found")
-		else :
+		if( len(finalBone) == 0 ) :
 			self.report({'WARNING'}, "Bone is not defined")
 			
 	else:
@@ -525,21 +568,25 @@ def SelectBone( self, ob, boneName, boneNameRepeat, manipulator, manipulatorRepe
 #
 class NumControlSelectPick(bpy.types.Operator):
 
-	"""Pick selected object (multiple selection supported)"""
+
+	"""Pick selected object(s) (hand icon support multiple selection)"""
 	bl_label = "Fill numeric"
 	bl_idname = "view3d.num_select_fill"
 	
 	index = StringProperty( name = "index" )
+	multipleSelection = BoolProperty( name = "multipleSelection", default = False )
+	
 	
 	def execute(self, context):
 		
 		selectedBone = ""
 		bones = bpy.context.selected_pose_bones
-
-		if(len(bones) > 1) :
+		
+		# Multiple selection is not allowed for all
+		if(self.multipleSelection and len(bones) > 1):
 			for b in bones :
 				selectedBone += b.name +";"
-				
+	
 		else:		
 			selectedBone = bpy.context.active_pose_bone.name
 		
@@ -565,6 +612,209 @@ class NumControlSelectPick(bpy.types.Operator):
 				
 		return {'FINISHED'}
 	
+
+class NumControlSelectReset(bpy.types.Operator):
+
+	"""Reset values for first use"""
+	bl_label = "Init value"
+	bl_idname = "view3d.num_select_reset"
+	
+	def execute(self, context):
+	
+		context.object.Initialize = True
+		
+		# RESET #
+		# 0
+		context.object.Num0 = ""
+		context.object.Num0R = ""
+		context.object.Num0D = ""
+		context.object.Num0S = ""
+		context.object.Num0M = 'NoChange'
+		context.object.Num0MR = 'NoChange'
+		context.object.Num0MD = 'NoChange'
+		context.object.Num0MS = 'NoChange'
+		context.object.Num0AutoIKN = False
+		context.object.Num0AutoIKR = False
+		context.object.Num0AutoIKD = False
+		context.object.Num0AutoIKS = False
+		
+		context.object.Num0SR = ""
+		context.object.Num0MSR = 'NoChange'
+		context.object.Num0AutoIKSR = False
+
+		
+		# 1
+		context.object.Num1 = ""
+		context.object.Num1R = ""
+		context.object.Num1D = ""
+		context.object.Num1S = ""
+		context.object.Num1M = 'NoChange'
+		context.object.Num1MR = 'NoChange'
+		context.object.Num1MD = 'NoChange'
+		context.object.Num1MS = 'NoChange'
+		context.object.Num1AutoIKN = False
+		context.object.Num1AutoIKR = False
+		context.object.Num1AutoIKD = False
+		context.object.Num1AutoIKS = False
+		
+		context.object.Num1SR = ""
+		context.object.Num1MSR = 'NoChange'
+		context.object.Num1AutoIKSR = False
+		
+		
+		# 2
+		context.object.Num2 = ""
+		context.object.Num2R = ""
+		context.object.Num2D = ""
+		context.object.Num2S = ""
+		context.object.Num2M = 'NoChange'
+		context.object.Num2MR = 'NoChange'
+		context.object.Num2MD = 'NoChange'
+		context.object.Num2MS = 'NoChange'
+		context.object.Num2AutoIKN = False
+		context.object.Num2AutoIKR = False
+		context.object.Num2AutoIKD = False
+		context.object.Num2AutoIKS = False
+		
+		context.object.Num2SR = ""
+		context.object.Num2MSR = 'NoChange'
+		context.object.Num2AutoIKSR = False
+		
+		
+		# 3
+		context.object.Num3 = ""
+		context.object.Num3R = ""
+		context.object.Num3D = ""
+		context.object.Num3S = ""
+		context.object.Num3M = 'NoChange'
+		context.object.Num3MR = 'NoChange'
+		context.object.Num3MD = 'NoChange'
+		context.object.Num3MS = 'NoChange'
+		context.object.Num3AutoIKN = False
+		context.object.Num3AutoIKR = False
+		context.object.Num3AutoIKD = False
+		context.object.Num3AutoIKS = False
+		
+		context.object.Num3SR = ""
+		context.object.Num3MSR = 'NoChange'
+		context.object.Num3AutoIKSR = False
+		
+		
+		# 4
+		context.object.Num4 = ""
+		context.object.Num4R = ""
+		context.object.Num4D = ""
+		context.object.Num4S = ""
+		context.object.Num4M = 'NoChange'
+		context.object.Num4MR = 'NoChange'
+		context.object.Num4MD = 'NoChange'
+		context.object.Num4MS = 'NoChange'
+		context.object.Num4AutoIKN = False
+		context.object.Num4AutoIKR = False
+		context.object.Num4AutoIKD = False
+		context.object.Num4AutoIKS = False
+		
+		context.object.Num4SR = ""
+		context.object.Num4MSR = 'NoChange'
+		context.object.Num4AutoIKSR = False
+		
+		
+		# 5
+		context.object.Num5 = ""
+		context.object.Num5R = ""
+		context.object.Num5D = ""
+		context.object.Num5S = ""
+		context.object.Num5M = 'NoChange'
+		context.object.Num5MR = 'NoChange'
+		context.object.Num5MD = 'NoChange'
+		context.object.Num5MS = 'NoChange'
+		context.object.Num5AutoIKN = False
+		context.object.Num5AutoIKR = False
+		context.object.Num5AutoIKD = False
+		context.object.Num5AutoIKS = False
+		
+		context.object.Num5SR = ""
+		context.object.Num5MSR = 'NoChange'
+		context.object.Num5AutoIKSR = False
+		
+		
+		# 6
+		context.object.Num6 = ""
+		context.object.Num6R = ""
+		context.object.Num6D = ""
+		context.object.Num6S = ""
+		context.object.Num6M = 'NoChange'
+		context.object.Num6MR = 'NoChange'
+		context.object.Num6MD = 'NoChange'
+		context.object.Num6MS = 'NoChange'
+		context.object.Num6AutoIKN = False
+		context.object.Num6AutoIKR = False
+		context.object.Num6AutoIKD = False
+		context.object.Num6AutoIKS = False
+		
+		context.object.Num6SR = ""
+		context.object.Num6MSR = 'NoChange'
+		context.object.Num6AutoIKSR = False
+		
+		
+		# 7
+		context.object.Num7 = ""
+		context.object.Num7R = ""
+		context.object.Num7D = ""
+		context.object.Num7S = ""
+		context.object.Num7M = 'NoChange'
+		context.object.Num7MR = 'NoChange'
+		context.object.Num7MD = 'NoChange'
+		context.object.Num7MS = 'NoChange'
+		context.object.Num7AutoIKN = False
+		context.object.Num7AutoIKR = False
+		context.object.Num7AutoIKD = False
+		context.object.Num7AutoIKS = False
+		
+		context.object.Num7SR = ""
+		context.object.Num7MSR = 'NoChange'
+		context.object.Num7AutoIKSR = False
+		
+		
+		# 8
+		context.object.Num8 = ""
+		context.object.Num8R = ""
+		context.object.Num8D = ""
+		context.object.Num8S = ""
+		context.object.Num8M = 'NoChange'
+		context.object.Num8MR = 'NoChange'
+		context.object.Num8MD = 'NoChange'
+		context.object.Num8MS = 'NoChange'
+		context.object.Num8AutoIKN = False
+		context.object.Num8AutoIKR = False
+		context.object.Num8AutoIKD = False
+		context.object.Num8AutoIKS = False
+		
+		context.object.Num8SR = ""
+		context.object.Num8MSR = 'NoChange'
+		context.object.Num8AutoIKSR = False
+		
+		
+		# 9
+		context.object.Num9 = ""
+		context.object.Num9R = ""
+		context.object.Num9D = ""
+		context.object.Num9S = ""
+		context.object.Num9M = 'NoChange'
+		context.object.Num9MR = 'NoChange'
+		context.object.Num9MD = 'NoChange'
+		context.object.Num9MS = 'NoChange'
+		context.object.Num9AutoIKN = False
+		context.object.Num9AutoIKR = False
+		context.object.Num9AutoIKD = False
+		context.object.Num9AutoIKS = False
+
+		context.object.Num9SR = ""
+		context.object.Num9MSR = 'NoChange'
+		context.object.Num9AutoIKSR = False
+		
+		return {'FINISHED'}
+
 	
 # Set default
 class NumControlSelectDefault(bpy.types.Operator):
@@ -577,198 +827,8 @@ class NumControlSelectDefault(bpy.types.Operator):
 	
 	def execute(self, context):
 		
-		# RESET #
-		
-		
-		# 0
-		bpy.context.object.Num0 = ""
-		bpy.context.object.Num0R = ""
-		bpy.context.object.Num0D = ""
-		bpy.context.object.Num0S = ""
-		bpy.context.object.Num0M = 'NoChange'
-		bpy.context.object.Num0MR = 'NoChange'
-		bpy.context.object.Num0MD = 'NoChange'
-		bpy.context.object.Num0MS = 'NoChange'
-		bpy.context.object.Num0AutoIKN = False
-		bpy.context.object.Num0AutoIKR = False
-		bpy.context.object.Num0AutoIKD = False
-		bpy.context.object.Num0AutoIKS = False
-		
-		bpy.context.object.Num0SR = ""
-		bpy.context.object.Num0MSR = 'NoChange'
-		bpy.context.object.Num0AutoIKSR = False
-
-		
-		# 1
-		bpy.context.object.Num1 = ""
-		bpy.context.object.Num1R = ""
-		bpy.context.object.Num1D = ""
-		bpy.context.object.Num1S = ""
-		bpy.context.object.Num1M = 'NoChange'
-		bpy.context.object.Num1MR = 'NoChange'
-		bpy.context.object.Num1MD = 'NoChange'
-		bpy.context.object.Num1MS = 'NoChange'
-		bpy.context.object.Num1AutoIKN = False
-		bpy.context.object.Num1AutoIKR = False
-		bpy.context.object.Num1AutoIKD = False
-		bpy.context.object.Num1AutoIKS = False
-		
-		bpy.context.object.Num1SR = ""
-		bpy.context.object.Num1MSR = 'NoChange'
-		bpy.context.object.Num1AutoIKSR = False
-		
-		
-		# 2
-		bpy.context.object.Num2 = ""
-		bpy.context.object.Num2R = ""
-		bpy.context.object.Num2D = ""
-		bpy.context.object.Num2S = ""
-		bpy.context.object.Num2M = 'NoChange'
-		bpy.context.object.Num2MR = 'NoChange'
-		bpy.context.object.Num2MD = 'NoChange'
-		bpy.context.object.Num2MS = 'NoChange'
-		bpy.context.object.Num2AutoIKN = False
-		bpy.context.object.Num2AutoIKR = False
-		bpy.context.object.Num2AutoIKD = False
-		bpy.context.object.Num2AutoIKS = False
-		
-		bpy.context.object.Num2SR = ""
-		bpy.context.object.Num2MSR = 'NoChange'
-		bpy.context.object.Num2AutoIKSR = False
-		
-		
-		# 3
-		bpy.context.object.Num3 = ""
-		bpy.context.object.Num3R = ""
-		bpy.context.object.Num3D = ""
-		bpy.context.object.Num3S = ""
-		bpy.context.object.Num3M = 'NoChange'
-		bpy.context.object.Num3MR = 'NoChange'
-		bpy.context.object.Num3MD = 'NoChange'
-		bpy.context.object.Num3MS = 'NoChange'
-		bpy.context.object.Num3AutoIKN = False
-		bpy.context.object.Num3AutoIKR = False
-		bpy.context.object.Num3AutoIKD = False
-		bpy.context.object.Num3AutoIKS = False
-		
-		bpy.context.object.Num3SR = ""
-		bpy.context.object.Num3MSR = 'NoChange'
-		bpy.context.object.Num3AutoIKSR = False
-		
-		
-		# 4
-		bpy.context.object.Num4 = ""
-		bpy.context.object.Num4R = ""
-		bpy.context.object.Num4D = ""
-		bpy.context.object.Num4S = ""
-		bpy.context.object.Num4M = 'NoChange'
-		bpy.context.object.Num4MR = 'NoChange'
-		bpy.context.object.Num4MD = 'NoChange'
-		bpy.context.object.Num4MS = 'NoChange'
-		bpy.context.object.Num4AutoIKN = False
-		bpy.context.object.Num4AutoIKR = False
-		bpy.context.object.Num4AutoIKD = False
-		bpy.context.object.Num4AutoIKS = False
-		
-		bpy.context.object.Num4SR = ""
-		bpy.context.object.Num4MSR = 'NoChange'
-		bpy.context.object.Num4AutoIKSR = False
-		
-		
-		# 5
-		bpy.context.object.Num5 = ""
-		bpy.context.object.Num5R = ""
-		bpy.context.object.Num5D = ""
-		bpy.context.object.Num5S = ""
-		bpy.context.object.Num5M = 'NoChange'
-		bpy.context.object.Num5MR = 'NoChange'
-		bpy.context.object.Num5MD = 'NoChange'
-		bpy.context.object.Num5MS = 'NoChange'
-		bpy.context.object.Num5AutoIKN = False
-		bpy.context.object.Num5AutoIKR = False
-		bpy.context.object.Num5AutoIKD = False
-		bpy.context.object.Num5AutoIKS = False
-		
-		bpy.context.object.Num5SR = ""
-		bpy.context.object.Num5MSR = 'NoChange'
-		bpy.context.object.Num5AutoIKSR = False
-		
-		
-		# 6
-		bpy.context.object.Num6 = ""
-		bpy.context.object.Num6R = ""
-		bpy.context.object.Num6D = ""
-		bpy.context.object.Num6S = ""
-		bpy.context.object.Num6M = 'NoChange'
-		bpy.context.object.Num6MR = 'NoChange'
-		bpy.context.object.Num6MD = 'NoChange'
-		bpy.context.object.Num6MS = 'NoChange'
-		bpy.context.object.Num6AutoIKN = False
-		bpy.context.object.Num6AutoIKR = False
-		bpy.context.object.Num6AutoIKD = False
-		bpy.context.object.Num6AutoIKS = False
-		
-		bpy.context.object.Num6SR = ""
-		bpy.context.object.Num6MSR = 'NoChange'
-		bpy.context.object.Num6AutoIKSR = False
-		
-		
-		# 7
-		bpy.context.object.Num7 = ""
-		bpy.context.object.Num7R = ""
-		bpy.context.object.Num7D = ""
-		bpy.context.object.Num7S = ""
-		bpy.context.object.Num7M = 'NoChange'
-		bpy.context.object.Num7MR = 'NoChange'
-		bpy.context.object.Num7MD = 'NoChange'
-		bpy.context.object.Num7MS = 'NoChange'
-		bpy.context.object.Num7AutoIKN = False
-		bpy.context.object.Num7AutoIKR = False
-		bpy.context.object.Num7AutoIKD = False
-		bpy.context.object.Num7AutoIKS = False
-		
-		bpy.context.object.Num7SR = ""
-		bpy.context.object.Num7MSR = 'NoChange'
-		bpy.context.object.Num7AutoIKSR = False
-		
-		
-		# 8
-		bpy.context.object.Num8 = ""
-		bpy.context.object.Num8R = ""
-		bpy.context.object.Num8D = ""
-		bpy.context.object.Num8S = ""
-		bpy.context.object.Num8M = 'NoChange'
-		bpy.context.object.Num8MR = 'NoChange'
-		bpy.context.object.Num8MD = 'NoChange'
-		bpy.context.object.Num8MS = 'NoChange'
-		bpy.context.object.Num8AutoIKN = False
-		bpy.context.object.Num8AutoIKR = False
-		bpy.context.object.Num8AutoIKD = False
-		bpy.context.object.Num8AutoIKS = False
-		
-		bpy.context.object.Num8SR = ""
-		bpy.context.object.Num8MSR = 'NoChange'
-		bpy.context.object.Num8AutoIKSR = False
-		
-		
-		# 9
-		bpy.context.object.Num9 = ""
-		bpy.context.object.Num9R = ""
-		bpy.context.object.Num9D = ""
-		bpy.context.object.Num9S = ""
-		bpy.context.object.Num9M = 'NoChange'
-		bpy.context.object.Num9MR = 'NoChange'
-		bpy.context.object.Num9MD = 'NoChange'
-		bpy.context.object.Num9MS = 'NoChange'
-		bpy.context.object.Num9AutoIKN = False
-		bpy.context.object.Num9AutoIKR = False
-		bpy.context.object.Num9AutoIKD = False
-		bpy.context.object.Num9AutoIKS = False
-
-		bpy.context.object.Num9SR = ""
-		bpy.context.object.Num9MSR = 'NoChange'
-		bpy.context.object.Num9AutoIKSR = False
-
+		ResetSetting( context )
+	
 		# ANIMAL #
 		if(self.preset == 0):
 			
