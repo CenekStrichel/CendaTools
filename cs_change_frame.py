@@ -29,7 +29,7 @@ bl_info = {
 
 
 import bpy
-from bpy.props import IntProperty, FloatProperty, BoolProperty
+from bpy.props import IntProperty, FloatProperty, BoolProperty, EnumProperty
 
 
 class ChangeFrame(bpy.types.Operator):
@@ -38,31 +38,51 @@ class ChangeFrame(bpy.types.Operator):
 	"""Change frame with dragging"""
 	bl_idname = "view3d.change_frame_drag"
 	bl_label = "Change Frame Drag"
-	
-	defaultSensitivity = FloatProperty( name = "Sensitivity", default = 5 )
-	autoSensitivity = BoolProperty( name = "Auto Sensitivity" )
 
+
+	autoSensitivity = BoolProperty( name = "Auto Sensitivity" )
+	defaultSensitivity = FloatProperty( name = "Sensitivity", default = 5 )
 	
+	mouseEnum = [
+	("LeftMouse", "Left Mouse", "", "", 0),
+    ("MiddleMouse", "Middle Mouse", "", "", 1),
+    ("RightMouse", "Right Mouse", "", "", 2)
+    ]
+	
+	mouseSetting = EnumProperty( name = "End Drag", description = "", items=mouseEnum, default = "RightMouse" )
+
+
 	global frameOffset
 	global mouseOffset
 	global sensitivity
-#	global previousOnlyRender
 	global previousManipulator
-	
-	
+
+
 	def modal(self, context, event):
 	
+		# set mouse up button
+		mouseEnd = ''
+		if(self.mouseSetting == 'LeftMouse'):
+			mouseEnd = 'LEFTMOUSE'
+			
+		elif(self.mouseSetting == 'RightMouse'):
+			mouseEnd = 'RIGHTMOUSE'
+			
+		elif(self.mouseSetting == 'MiddleMouse'):
+			mouseEnd = 'MIDDLEMOUSE'
+			
+			
 		# change frame
 		if event.type == 'MOUSEMOVE':
 			
 			delta = self.mouseOffset - event.mouse_x
 			bpy.context.scene.frame_current = (-delta * self.sensitivity) + self.frameOffset
 
+
 		# end of modal
-		elif event.type == 'RIGHTMOUSE' and event.value == 'RELEASE':
+		elif event.type == mouseEnd and event.value == 'RELEASE':
 			
 			# previous viewport setting
-		#	bpy.context.space_data.show_only_render = self.previousOnlyRender
 			bpy.context.space_data.show_manipulator = self.previousManipulator
 			
 			# cursor back
@@ -76,9 +96,7 @@ class ChangeFrame(bpy.types.Operator):
 	def invoke(self, context, event):
 		
 		# hide viewport helpers
-#		self.previousOnlyRender = bpy.context.space_data.show_only_render
 		self.previousManipulator = bpy.context.space_data.show_manipulator
-#		bpy.context.space_data.show_only_render = True
 		bpy.context.space_data.show_manipulator = False
 		
 		# start modal
