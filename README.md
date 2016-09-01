@@ -4,6 +4,9 @@ Addons for Blender (Mainly for animators)
 Read full description here:
 https://blenderartists.org/forum/showthread.php?405910-Addon-Cenda-Tools
 
+
+
+
 Hello, I created this thread to publish my addons that I've made during production. I am using it both for my personal projects, and mostly when creating animations for our latest game Planet Nomads. You can check it here: https://www.planet-nomads.com/
 
 As an ex-Autodesk user (3dsmax, Maya, Softimge ) I didn`t like some of the behaviour or miss some little things in Blender. So I created these addons. I also hope that this thread will be read by some Blender developers so I am also adding suggestions on how it can be implemented into Blender 
