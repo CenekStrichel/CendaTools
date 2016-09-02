@@ -24,7 +24,7 @@ bl_info = {
 	"version": (1, 0, 0),
 	"blender": (2, 77, 0),
 	"description": "Selecting bones with numeric keys",
-	"location": "Hotkey"
+	"location": "Armature Properties + Set hotkey with 'view3d.num_select'"
 }
 
 
