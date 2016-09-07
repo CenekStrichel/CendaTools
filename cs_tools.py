@@ -125,35 +125,36 @@ class ChangeCamShot(bpy.types.Operator):
 				last = True
 				
 			else:		
-				bpy.context.scene.frame_preview_start = bpy.context.scene.frame_current
+				bpy.context.scene.frame_preview_start = bpy.context.scene.frame_current + 1
 			
 				# start range
 				markerStatus = bpy.ops.screen.marker_jump(next = True)
 				if(markerStatus == {'CANCELLED'} ):
 					bpy.context.scene.frame_preview_end += 200
 				else:	
-					bpy.context.scene.frame_preview_end = bpy.context.scene.frame_current
+					bpy.context.scene.frame_preview_end = bpy.context.scene.frame_current + 1
 					
 	
 		# BACKWARD #
 		else:
-			
-			# is it last?
-			markerStatus = bpy.ops.screen.marker_jump(next = False)
-			if(markerStatus == {'CANCELLED'} ):	
-				self.report({'INFO'},"First Shot Reached") # TODO: not working well
 
-			else:		
+			bpy.ops.screen.marker_jump(next = False)
+	
+			bpy.context.scene.frame_preview_end = bpy.context.scene.frame_current
+		
+			# start range
+			markerStatus = bpy.ops.screen.marker_jump(next = False)
+			if(markerStatus == {'CANCELLED'} ):
+				bpy.context.scene.frame_preview_start = 0
+			else:	
+				bpy.context.scene.frame_preview_start = bpy.context.scene.frame_current
+	
+			# if end, jump to first
+			if( bpy.context.scene.frame_preview_start == 0 and bpy.context.scene.frame_preview_end == 0):
+				markerStatus = bpy.ops.screen.marker_jump(next = True)
 				bpy.context.scene.frame_preview_end = bpy.context.scene.frame_current
-			
-				# start range
-				markerStatus = bpy.ops.screen.marker_jump(next = False)
-				if(markerStatus == {'CANCELLED'} ):
-					bpy.context.scene.frame_preview_start = 0
-				else:	
-					bpy.context.scene.frame_preview_start = bpy.context.scene.frame_current
-	
-	
+				self.report({'INFO'},"First Shot Reached")
+				
 		# change after setting shot
 		bpy.context.scene.frame_current	= bpy.context.scene.frame_preview_start
 		if(not last):
@@ -442,7 +443,7 @@ class OrientationSwitcher(bpy.types.Operator):
 		return {'FINISHED'}
 '''	
 
-# my isolate version
+# my isolate version - not working well, don`t use it
 class IsolateObject(bpy.types.Operator):
 	
 	bl_idname = "view3d.isolate_object"
@@ -514,9 +515,8 @@ class ShowAllOp(bpy.types.Operator):
 	
 				
 ################
-# POSE ANIMATION FLIPPED #
+# CUT STRIP #
 ################
-
 # copy and flip pose in one step
 class CutStrip(bpy.types.Operator):
 
