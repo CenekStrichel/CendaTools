@@ -536,24 +536,24 @@ def SelectBone( self, ob, boneName, boneNameRepeat, manipulator, manipulatorRepe
 		else:
 			ob.pose.bones[ finalBone ].bone.select = True
 			ob.data.bones.active = ob.pose.bones[ finalBone ].bone
-			
+		
 		# manipulator	
-		if(finalManipulator == 'Translate'):
+		if(finalManipulator == 1):
 			bpy.context.space_data.transform_manipulators = {'TRANSLATE'}
 			
-		elif(finalManipulator == 'Rotate'):
+		elif(finalManipulator == 2):
 			bpy.context.space_data.transform_manipulators = {'ROTATE'}
 			
-		elif(finalManipulator == 'Scale'):
+		elif(finalManipulator == 3):
 			bpy.context.space_data.transform_manipulators = {'SCALE'}
 			
-		elif(finalManipulator == 'TranslateRotate'):
+		elif(finalManipulator == 4):
 			bpy.context.space_data.transform_manipulators = {'TRANSLATE', 'ROTATE'}
 		
-		elif(finalManipulator == 'RotateScale'):
+		elif(finalManipulator == 5):
 			bpy.context.space_data.transform_manipulators = {'ROTATE', 'SCALE'}
 			
-		elif(finalManipulator == 'ScaleTranslate'):
+		elif(finalManipulator == 6):
 			bpy.context.space_data.transform_manipulators = {'SCALE', 'TRANSLATE'}
 			
 		
