@@ -24,7 +24,7 @@ bl_info = {
 	"version": (1, 0, 1),
 	"blender": (2, 78, 0),
 	"location": "Tools > Offset Animation",
-	"description": "Offset for animated object (only euler is supported now)",
+	"description": "Offset for animated object and bones",
 	"category": "Cenda Tools"}
 	
 
