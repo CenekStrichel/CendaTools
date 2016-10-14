@@ -635,6 +635,9 @@ class VIEW3D_HT_header_cenda(Header):
 		row.operator("scene.simplify_toggle", icon = current_icon)
 		row = layout.row(align=True)
 		
+		row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
+		row = layout.row(align=True)
+		
 		'''
 		# fluid bake
 		obj = bpy.context.active_object
