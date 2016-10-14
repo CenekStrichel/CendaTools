@@ -21,9 +21,9 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 77, 0),
-	"location": "Tools > Export to FBX",
+	"version": (1, 0, 1),
+	"blender": (2, 78, 0),
+	"location": "Export panel in Tools",
 	"description": "Export selected objects to destination (FBX)",
 	"category": "Cenda Tools"}
 	
@@ -62,7 +62,10 @@ class StringsGroup(bpy.types.PropertyGroup):
 	subtype = "FILE_PATH", 
 	description = "Optional\nCopy exported file to file")
 	
-	
+	bpy.types.Scene.Blacklist = bpy.props.StringProperty( 
+	name = "", 
+	default = "colliderBake.",
+	description = "Optional\nYou can deselect objects with prefix")
 
 
 class ExportToPlacePanel(bpy.types.Panel):
@@ -72,7 +75,7 @@ class ExportToPlacePanel(bpy.types.Panel):
 	
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "TOOLS"
-	bl_category = "Tools"
+	bl_category = "Export"
 	bl_context = "objectmode"
 
 
@@ -87,8 +90,11 @@ class ExportToPlacePanel(bpy.types.Panel):
 		
 		box.label("Settings")
 		box.prop( scn, "Simplify" )
-		box.prop( scn, "NLAExport" )	
+		box.prop( scn, "NLAExport" )
 		
+		box = layout.box()	
+		box.label("Blacklist")
+		box.prop( scn, "Blacklist" )	
 
 		# Export
 		box = layout.box()
@@ -120,7 +126,13 @@ class ExportToPlace(bpy.types.Operator):
 	def execute(self, context ):
 
 		exportPath = context.scene.ExportFBX
-		
+
+		# deselect all blacklisted
+		if(len(context.scene.Blacklist) > 0):
+			for ob in bpy.data.objects:
+				if(ob.name.startswith( context.scene.Blacklist )):
+					ob.select = False
+				
 		# check if something is selected
 		if( len(context.selected_objects) == 0):
 			self.report({'ERROR'}, ("No objects selected") )
