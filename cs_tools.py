@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 77, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 78, 0),
 	"location": "Many commands",
 	"description": "Many tools",
 	"category": "Cenda Tools"}
@@ -166,7 +166,33 @@ class ChangeCamShot(bpy.types.Operator):
 
 		return{'FINISHED'}
 			
+
+class ShowCameraView(bpy.types.Operator):
+
+	bl_idname = "screen.show_camera_view"
+	bl_label = "Show Camera View"
+
+	def execute(self, context):
+		
+		space = bpy.context.space_data
+		
+		# Normal view
+		if(space.region_3d.view_perspective == 'CAMERA'):
+			space.show_only_render = False
+			space.show_manipulator = True
+			space.fx_settings.use_ssao  = False
+
+		# CAMERA VIEW
+		else:
+			space.show_only_render = True
+			space.show_manipulator = False
+			space.fx_settings.use_ssao  = True
 			
+		bpy.ops.view3d.viewnumpad(type = "CAMERA")
+
+		return {'FINISHED'}
+	
+	
 ################################################################
 # play animation and stop with restore time position
 class AnimationPlayRestore(bpy.types.Operator):
@@ -191,6 +217,7 @@ class AnimationPlayRestore(bpy.types.Operator):
 			bpy.ops.screen.animation_play()	
 			
 		# change only current
+		
 		'''	
 		space = bpy.context.space_data
 		
@@ -206,9 +233,9 @@ class AnimationPlayRestore(bpy.types.Operator):
 				space.show_manipulator = isplaying
 				space.fx_settings.use_ssao = False
 	
-		
 		else:
 		'''
+		
 		# areas #
 		for area in bpy.context.screen.areas: # iterate through areas in current screen
 			if area.type == 'VIEW_3D':
@@ -701,10 +728,33 @@ class SetInOutRange(bpy.types.Operator):
 		else:
 			bpy.context.scene.frame_preview_end = bpy.context.scene.frame_current
 
-
 		return {'FINISHED'}	
+		
+	
+class ShowMaterial(bpy.types.Operator):
+
+	'''Show Material'''
+	bl_idname = "scene.show_material"
+	bl_label = "Show Material"
+	bl_options = {'REGISTER', 'UNDO'}
+
+
+	def execute(self, context):
+		
+		obj = bpy.context.active_object
+
+		#
+		if(obj.type == "MESH"):
 			
-				
+			for area in bpy.context.screen.areas: # iterate through areas in current screen
+				if area.type == 'PROPERTIES':
+					for space in area.spaces: # iterate through all founded panels
+						if space.type == 'PROPERTIES':	
+							space.context = 'MATERIAL'
+						
+		return {'FINISHED'}	
+	
+						
 ################################################################
 # register #
 
