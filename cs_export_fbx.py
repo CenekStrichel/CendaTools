@@ -21,9 +21,9 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 78, 0),
-	"location": "Export panel in Tools",
+	"location": "Export settings in Scene Properties, Export button in Header View3D",
 	"description": "Export selected objects to destination (FBX)",
 	"category": "Cenda Tools"}
 	
@@ -73,12 +73,11 @@ class ExportToPlacePanel(bpy.types.Panel):
 	bl_label = "Export to FBX"
 	bl_idname = "EXPORT_PANEL"
 	
-	bl_space_type = "VIEW_3D"
-	bl_region_type = "TOOLS"
-	bl_category = "Export"
-	bl_context = "objectmode"
-
-
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+	bl_context = "scene"
+	
+	
 	def draw(self, context):
 		
 		scn = context.scene
