@@ -648,7 +648,7 @@ class VIEW3D_HT_header_cenda(Header):
 		row = layout.row(align=True)
 		
 		# buttons
-		row.operator("screen.region_quadview", text = "Toggle Quad View")
+		row.operator("screen.region_quadview", text = "Quad View", icon = "VIEW3D_VEC")
 		row = layout.row(align=True)
 		
 		# simplify
@@ -662,8 +662,10 @@ class VIEW3D_HT_header_cenda(Header):
 		row.operator("scene.simplify_toggle", icon = current_icon)
 		row = layout.row(align=True)
 		
-		row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
-		row = layout.row(align=True)
+		# export path must be filled
+		if( len(bpy.context.scene.ExportFBX) > 0 ):
+			row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
+			row = layout.row(align=True)
 		
 		'''
 		# fluid bake
