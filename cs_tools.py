@@ -756,7 +756,49 @@ class ShowMaterial(bpy.types.Operator):
 						
 		return {'FINISHED'}	
 	
-						
+	
+class ParentObject(bpy.types.Operator):
+
+	'''Make Parent and Show'''
+	bl_idname = "object.parent_and_show"
+	bl_label = "Make Parent and Show"
+	bl_options = {'REGISTER', 'UNDO'}
+
+
+	def execute(self, context):
+		
+		# show all
+		for obj in bpy.context.selected_objects:
+			obj.hide = False
+			
+		bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+				
+		return {'FINISHED'}
+	
+
+#class SelectRecursiveAndShow(bpy.types.Operator):
+
+#	'''Select Recursive and Show'''
+'''
+	bl_idname = "outliner.select_recursive_and_show"
+	bl_label = "Select Recursive and Show"
+	bl_options = {'REGISTER', 'UNDO'}
+
+
+	def execute(self, context):
+		
+		bpy.ops.outliner.item_activate('INVOKE_DEFAULT')
+
+		
+		
+	#	# show all
+	#	for obj in bpy.context.selected_objects:
+	#		obj.hide = False
+			
+	#	bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+				
+		return {'FINISHED'}	
+'''							
 ################################################################
 # register #
 
