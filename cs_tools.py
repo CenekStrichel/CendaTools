@@ -663,9 +663,9 @@ class VIEW3D_HT_header_cenda(Header):
 		row = layout.row(align=True)
 		
 		# export path must be filled
-		if( len(bpy.context.scene.ExportFBX) > 0 ):
-			row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
-			row = layout.row(align=True)
+	#	if( len(bpy.context.scene.ExportFBX) > 0 ):
+		row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
+		row = layout.row(align=True)
 		
 		'''
 		# fluid bake
