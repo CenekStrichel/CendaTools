@@ -49,7 +49,7 @@ class SmartObjectMode(bpy.types.Operator):
 
 	def execute(self, context):
 		
-		obj = bpy.context.active_object
+		obj = context.active_object
 		print("Smart Mode Type: " + obj.type)
 		
 		#
@@ -76,7 +76,7 @@ class SmartObjectMode(bpy.types.Operator):
 			
 		return {'FINISHED'}
 	
-			
+	
 def SetPropertiesPanel( panelName, onlyObjectMode = False ):
 	
 	# new is object mode
@@ -107,8 +107,10 @@ def SetPropertiesPanel( panelName, onlyObjectMode = False ):
 			
 			
 	
-	
-					
+# wm.context_toggle	
+# bpy.context.tool_settings.use_uv_select_sync	
+
+				
 ################################################################
 # register #
 ############
