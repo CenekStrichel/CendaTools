@@ -54,7 +54,18 @@ class SmartObjectMode(bpy.types.Operator):
 		
 		#
 		if(obj.type == "ARMATURE"):
-			bpy.ops.object.posemode_toggle()
+			
+			# try use my rig switcher
+			try:
+				if context.active_object.mode == 'OBJECT':
+					bpy.ops.cenda.pose()
+				else:
+					bpy.ops.cenda.object()
+					
+			# else normal switch
+			except:
+				bpy.ops.object.posemode_toggle()
+				
 			SetPropertiesPanel( 'DATA' )
 		
 		#	
