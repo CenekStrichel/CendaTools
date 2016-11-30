@@ -359,6 +359,51 @@ class FrameCurve(bpy.types.Operator):
 		return {'FINISHED'}	
 
 
+class WeightMaskSelect(bpy.types.Operator):
+	
+	bl_idname = "paint.weight_mask_select"
+	bl_label = "Weight Mask Select"
+	
+	SelectTypeEnum = [
+		("More", "More", "", "", 0),
+	    ("Less", "Less", "", "", 100),
+	    ]
+	
+	selectType = EnumProperty( name = "Select Type", description = "", items=SelectTypeEnum )
+	
+#	@classmethod
+#	def poll(cls, context):
+#		return context.area.type == 'GRAPH_EDITOR'
+
+	def execute(self, context):
+		
+		'''
+		if(context.weight_paint_object.data.use_paint_mask_vertex):
+			self.report({'ERROR'}, "Only Face Mask is supported for now!")
+			return {'FINISHED'}	
+		
+		if(context.object.data.use_paint_mask_vertex):
+			self.report({'ERROR'}, "Only Face Mask is supported for now!")
+			return {'FINISHED'}	
+		'''
+		
+	#	bpy.context.object.data.use_paint_mask = True
+
+		bpy.ops.object.editmode_toggle()
+		
+			
+		if(self.selectType == 'More'):
+			bpy.ops.mesh.select_more()
+			
+		elif(self.selectType == 'Less'):
+			bpy.ops.mesh.select_less()
+			
+		bpy.ops.object.editmode_toggle()
+		bpy.ops.paint.weight_paint_toggle()
+		
+		return {'FINISHED'}	
+	
+
 # MATERIAL / SOLID / TEXTURE
 class DisplaySwitcher(bpy.types.Operator):
 	
@@ -480,7 +525,9 @@ class IsolateObject(bpy.types.Operator):
 		
 		obj = bpy.context.selected_objects
 		if(len(obj) > 0):
+			
 			bpy.ops.view3d.localview()
+			
 			if(bpy.context.object.type == 'MESH'):
 				bpy.ops.object.select_all(action='TOGGLE')
 			
@@ -492,6 +539,32 @@ class IsolateObject(bpy.types.Operator):
 				 
 		return {'FINISHED'}
 	
+	
+	
+class JoinObjectsWithUV(bpy.types.Operator):
+	
+	bl_idname = "object.join_with_uv"
+	bl_label = "Join with UV"
+	bl_options = {'REGISTER', 'UNDO'}
+	
+	uvmerge = BoolProperty(name="UV Merge",default=True)
+	
+	def execute(self, context):
+		
+		if(self.uvmerge):
+			# rename UV for merge
+			newName = bpy.context.object.data.uv_textures[0].name
+			
+			# all objects UV rename
+			for obj in bpy.context.selected_objects:
+				obj.data.uv_textures[0].name = newName
+
+		# join
+		bpy.ops.object.join()	
+						 
+		return {'FINISHED'}
+		
+
 	
 ################	
 class NLAToolsButtons(Header):
