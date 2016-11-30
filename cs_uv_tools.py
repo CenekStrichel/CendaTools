@@ -44,15 +44,48 @@ class SmartUVMode(bpy.types.Operator):
 
 	def execute(self, context):
 
+		# go to EDIT mode first
 		if(bpy.context.active_object.mode == 'OBJECT'):
 			bpy.ops.object.mode_set(mode = 'EDIT')
-			
+		
+		# switch between sync mode	
 		else:
+			
+			# VERTEX mode #
 			if(not bpy.context.tool_settings.use_uv_select_sync):
+				
+				if(bpy.context.scene.tool_settings.uv_select_mode == 'VERTEX'):
+					bpy.context.tool_settings.mesh_select_mode = (True, False, False)
+				
+				elif(bpy.context.scene.tool_settings.uv_select_mode == 'EDGE'):
+					bpy.context.tool_settings.mesh_select_mode = (False, True, False)
+					
+				elif(bpy.context.scene.tool_settings.uv_select_mode == 'FACE'):
+					bpy.context.tool_settings.mesh_select_mode = (False, False, True)
+					
+				elif(bpy.context.scene.tool_settings.uv_select_mode == 'ISLAND'):
+					bpy.context.tool_settings.mesh_select_mode = (False, False, True)
+							
 				bpy.context.tool_settings.use_uv_select_sync = True
+				
+				bpy.ops.mesh.select_all(action='DESELECT') # deselect all because it is not needed
+				
+			#  UV mode #	
 			else:
+
+				if(bpy.context.tool_settings.mesh_select_mode[0] ):
+					bpy.context.scene.tool_settings.uv_select_mode = 'VERTEX'
+					
+				elif(bpy.context.tool_settings.mesh_select_mode[1] ):
+					bpy.context.scene.tool_settings.uv_select_mode = 'EDGE'
+					
+				elif(bpy.context.tool_settings.mesh_select_mode[2] ):
+					bpy.context.scene.tool_settings.uv_select_mode = 'FACE'
+					
+
 				bpy.context.tool_settings.use_uv_select_sync = False
-				bpy.ops.mesh.select_all(action='SELECT')
+
+				bpy.ops.mesh.select_all(action='SELECT') # select all for show all UV
 		
 			
 		return {'FINISHED'}
@@ -101,6 +134,33 @@ class SmartUVComponentMode(bpy.types.Operator):
 		
 			
 		return {'FINISHED'}
+
+
+# change object mode by selection			
+class StickyModeSwitch(bpy.types.Operator):
+
+	'''Switch Sticky Mode'''
+	bl_idname = "uv.sticky_switch"
+	bl_label = "Switch Sticky Mode"
+	bl_options = {'REGISTER', 'UNDO'}
+
+
+	StickyModeEnum = [
+		("DISABLED", "Disabled", "", "", 0),
+	    ("SHARED_LOCATION", "Shared Location", "", "", 100),
+		("SHARED_VERTEX", "Shared Vertex", "", "", 200)
+	    ]
+	
+	stickyMode = EnumProperty( name = "Sticky Mode", description = "", items=StickyModeEnum )
+	
+	
+	def execute(self, context):
+
+		space = bpy.context.space_data
+		space.uv_editor.sticky_select_mode = self.stickyMode
+		
+		return {'FINISHED'}
+	
 
 				
 ################################################################
