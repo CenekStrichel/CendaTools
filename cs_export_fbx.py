@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 78, 0),
 	"location": "Export settings in Scene Properties, Export button in Header View3D",
 	"description": "Export selected objects to destination (FBX)",
@@ -30,47 +30,72 @@ bl_info = {
 
 import bpy
 from shutil import copyfile
+from bpy.props import IntProperty, BoolProperty, FloatProperty, StringProperty, EnumProperty
 
 
 class StringsGroup(bpy.types.PropertyGroup):
 	
-	bpy.types.Scene.Simplify = bpy.props.FloatProperty(
+	bpy.types.Scene.Simplify = FloatProperty(
 	name = "Simplify",
 	default = 0.1,
 	soft_min = 0.0,
 	description = "How simplify baked animation\n0 is disabled")
 	
-	bpy.types.Scene.NLAExport = bpy.props.BoolProperty( 
+	bpy.types.Scene.NLAExport = BoolProperty( 
 	name = "Export NLA Strips", 
 	default = True, 
 	description = "Only clip from NLA will be exported")
 	
-	bpy.types.Scene.ExportFBX = bpy.props.StringProperty(
+	bpy.types.Scene.ExportPath = StringProperty(
 	name = "Export",
 	default = "",
 	subtype = "FILE_PATH",
 	description = "Export path\nE:\\model.fbx")
 	
-	bpy.types.Scene.Backup = bpy.props.BoolProperty( 
+	bpy.types.Scene.Backup = BoolProperty( 
 	name = "Backup", 
 	default = False, 
 	description = "Optional\nEnable copy exported file to file")
 	
-	bpy.types.Scene.BackupFBX = bpy.props.StringProperty( 
+	bpy.types.Scene.BackupPath = StringProperty( 
 	name = "Backup Path", 
 	default = "", 
 	subtype = "FILE_PATH", 
 	description = "Optional\nCopy exported file to file")
 	
-	bpy.types.Scene.Blacklist = bpy.props.StringProperty( 
+	bpy.types.Scene.Blacklist = StringProperty( 
 	name = "", 
 	default = "colliderBake.",
 	description = "Optional\nYou can deselect objects with prefix")
 
 
+	bpy.types.Object.ExportOverride = BoolProperty( 
+	name = "Override", 
+	default = False, 
+	description = "Export override for object")
+	
+	bpy.types.Object.ExportPathOverride = StringProperty(
+	name = "Export Path Override",
+	default = "",
+	subtype = "FILE_PATH",
+	description = "Export path\nE:\\model_object.fbx")
+	
+	#
+	FormatTypeEnum = [
+		("FBX", "FBX", "", "", 0),
+	    ("Blend", "Blend", "", "", 100)
+	    ]
+	
+	bpy.types.Scene.ExportFormat = EnumProperty( 
+	name = "Export Format", 
+	description = "", 
+	items = FormatTypeEnum )
+	
+	
+	
 class ExportToPlacePanel(bpy.types.Panel):
 	
-	bl_label = "Export to FBX"
+	bl_label = "Export Selected"
 	bl_idname = "EXPORT_PANEL"
 	
 	bl_space_type = "PROPERTIES"
@@ -84,13 +109,20 @@ class ExportToPlacePanel(bpy.types.Panel):
 		layout = self.layout
 		row = layout.row(align=True)
 
+
+		box = layout.box()
+		box.label("Format")
+		box.prop( scn, "ExportFormat" )
+		
 		# Settings
 		box = layout.box()
-		
 		box.label("Settings")
 		box.prop( scn, "Simplify" )
 		box.prop( scn, "NLAExport" )
 		
+		if(scn.ExportFormat == 'Blend'):
+			box.enabled = False
+			
 		box = layout.box()	
 		box.label("Blacklist")
 		box.prop( scn, "Blacklist" )	
@@ -99,13 +131,13 @@ class ExportToPlacePanel(bpy.types.Panel):
 		box = layout.box()
 		
 		box.label("Export Paths")
-		box.prop( scn, "ExportFBX", text = "" )
+		box.prop( scn, "ExportPath", text = "" )
 
 		# Backup
 		box.prop( scn, "Backup" )
 
-		if(bpy.context.scene.Backup):
-			box.prop( scn, "BackupFBX", text = ""  )
+		if(scn.Backup):
+			box.prop( scn, "BackupPath", text = ""  )
 
 		# Export button
 		row = layout.row(align=True)
@@ -113,7 +145,32 @@ class ExportToPlacePanel(bpy.types.Panel):
 		row.operator("cenda.export_to_place", text = "Export", icon="EXPORT" )
 
 
-# rename button	
+class ExportToPlaceObjectPanel(bpy.types.Panel):
+	
+	bl_label = "Export Selected Override"
+	bl_idname = "EXPORT_PANEL_OVERRIDE"
+	
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+	bl_context = "object"
+	
+	
+	def draw(self, context):
+		
+		scn = context.scene
+		layout = self.layout
+		row = layout.row(align=True)
+
+		# Settings
+		box = layout.box()
+		
+		box.prop( context.object, "ExportOverride" )
+		
+		if(bpy.context.object.ExportOverride):
+			box.prop( context.object, "ExportPathOverride" )
+
+		
+# export button	
 class ExportToPlace(bpy.types.Operator):
 	
 	
@@ -123,9 +180,26 @@ class ExportToPlace(bpy.types.Operator):
 
 
 	def execute(self, context ):
+		
+		scn = context.scene
+		exportPath = scn.ExportPath
+		
+		# right extension
+		if(scn.ExportFormat == 'FBX'):
+			extension = ".fbx"
+			
+		else:
+			extension = ".blend"	
+			
+		# Override export object
+		for obj in bpy.context.selected_objects:
+			if( obj.ExportOverride ):
+				if( not obj.ExportPathOverride.endswith (extension) and not obj.ExportPathOverride.endswith(str.upper(extension)) ):
+					obj.ExportPathOverride += extension # save to settings
 
-		exportPath = context.scene.ExportFBX
-
+				exportPath = obj.ExportPathOverride # BUG, blend is not added
+				break
+			
 		# deselect all blacklisted
 		if(len(context.scene.Blacklist) > 0):
 			for ob in bpy.data.objects:
@@ -142,66 +216,93 @@ class ExportToPlace(bpy.types.Operator):
 			self.report({'ERROR'}, ("Export path is not setted") )
 			return{'FINISHED'}
 
-		# check fbx
-		if( not exportPath.endswith (".fbx") and not exportPath.endswith (".FBX") ):
-			context.scene.ExportFBX += ".fbx"
-			exportPath += ".fbx"
-			
+		# check extension
+		if( not exportPath.endswith (extension) and not exportPath.endswith (str.upper(extension)) ):
+			scn.ExportPath += extension # save to settings
+			exportPath = scn.ExportPath # BUG, blend is not added
+	
 		# convert relative path to absolute
 		exportPath = bpy.path.abspath( exportPath ) 
 		
-		# export
-		bpy.ops.export_scene.fbx(
+		if(len(exportPath) > 0):
+			
+			# FBX # export
+			if(extension == ".fbx"):
+				bpy.ops.export_scene.fbx(
 
-		filepath = exportPath,
-		check_existing = True,
-		axis_forward = '-Z',
-		axis_up = 'Y',
-		version = 'BIN7400',
+				filepath = exportPath,
+				check_existing = True,
+				axis_forward = '-Z',
+				axis_up = 'Y',
+				version = 'BIN7400',
 
-		use_selection = True,
-		global_scale = 1.0,
-		apply_unit_scale = False,
-		bake_space_transform = False,
-		object_types = {'MESH', 'OTHER', 'EMPTY', 'CAMERA', 'LAMP', 'ARMATURE'},
-		use_mesh_modifiers = True,
-		mesh_smooth_type = 'OFF',
+				use_selection = True,
+				global_scale = 1.0,
+				apply_unit_scale = False,
+				bake_space_transform = False,
+				object_types = {'MESH', 'OTHER', 'EMPTY', 'CAMERA', 'LAMP', 'ARMATURE'},
+				use_mesh_modifiers = True,
+				mesh_smooth_type = 'OFF',
 
-		use_mesh_edges = False,
-		use_tspace = False,
-		use_custom_props = False,
-		add_leaf_bones = False,
-		primary_bone_axis = 'Y',
-		secondary_bone_axis = 'X',
-		use_armature_deform_only = True,
-		armature_nodetype = 'NULL',
+				use_mesh_edges = False,
+				use_tspace = False,
+				use_custom_props = False,
+				add_leaf_bones = False,
+				primary_bone_axis = 'Y',
+				secondary_bone_axis = 'X',
+				use_armature_deform_only = True,
+				armature_nodetype = 'NULL',
 
-		bake_anim = True,
-		bake_anim_use_all_bones = True,
-		bake_anim_use_nla_strips = context.scene.NLAExport,
-		bake_anim_use_all_actions = False,
-		bake_anim_force_startend_keying = True,
-		bake_anim_step = 1.0,
-		bake_anim_simplify_factor = context.scene.Simplify,
+				bake_anim = True,
+				bake_anim_use_all_bones = True,
+				bake_anim_use_nla_strips = context.scene.NLAExport,
+				bake_anim_use_all_actions = False,
+				bake_anim_force_startend_keying = True,
+				bake_anim_step = 1.0,
+				bake_anim_simplify_factor = context.scene.Simplify,
 
-		use_anim = True,
-		use_anim_action_all = True,
-		use_default_take = True,
-		use_anim_optimize = True,
+				use_anim = True,
+				use_anim_action_all = True,
+				use_default_take = True,
+				use_anim_optimize = True,
 
-		anim_optimize_precision = 6.0,
-		path_mode = 'AUTO',
-		embed_textures = False,
-		batch_mode = 'OFF',
-		use_batch_own_dir = True
-		)
+				anim_optimize_precision = 6.0,
+				path_mode = 'AUTO',
+				embed_textures = False,
+				batch_mode = 'OFF',
+				use_batch_own_dir = True
+				)
+				
+			# Blend # export	
+			elif(extension == ".blend"):
+				try:
+					bpy.ops.export_scene.selected(
+					filepath= exportPath, 
+					exporter='BLEND', 
+					exporter_index=0, 
+					use_convert_mesh=False, 
+					exporter_str="BLEND", 
+					use_convert_dupli=False, 
+					filter_glob="*.blend", 
+					filename_ext=".blend", 
+					use_file_browser=True
+					)
+					
+				except:
+					self.report({'ERROR'}, ("You need install Export Selected add-on!") )
+					return{'FINISHED'}
 
-		self.report({'INFO'}, ("Exported to " + exportPath) )
+			self.report({'INFO'}, ("Exported to " + exportPath) )
+			
+		else:
+			self.report({'ERROR'}, ("No export path found") )
+			return{'FINISHED'}
+		
 		
 		# BACKUP #
-		if( context.scene.Backup ):
+		if( scn.Backup ):
 
-			backupPath = context.scene.BackupFBX
+			backupPath = scn.BackupPath
 			
 			# make backup
 			if( backupPath == "" ):
@@ -209,9 +310,9 @@ class ExportToPlace(bpy.types.Operator):
 				return{'FINISHED'}
 	
 			# check fbx
-			if( not backupPath.endswith (".fbx") and not backupPath.endswith (".FBX") ):
-				context.scene.BackupFBX += ".fbx"
-				backupPath += ".fbx"
+			if( not backupPath.endswith ( extension ) and not backupPath.endswith ( str.upper(extension) ) ):
+				scn.BackupPath += extension
+				backupPath += extension
 				
 			# convert relative path to absolute	
 			backupPath = bpy.path.abspath( backupPath )
@@ -224,7 +325,7 @@ class ExportToPlace(bpy.types.Operator):
 
 ################################################################
 # register #
-
+############
 def register():
 	bpy.utils.register_module(__name__)
 	
