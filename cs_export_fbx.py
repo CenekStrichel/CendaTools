@@ -95,7 +95,7 @@ class StringsGroup(bpy.types.PropertyGroup):
 	
 class ExportToPlacePanel(bpy.types.Panel):
 	
-	bl_label = "Export Selected"
+	bl_label = "Export Settings"
 	bl_idname = "EXPORT_PANEL"
 	
 	bl_space_type = "PROPERTIES"
