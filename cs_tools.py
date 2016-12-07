@@ -227,6 +227,7 @@ class AnimationPlayRestore(bpy.types.Operator):
 				space.show_only_render = not isplaying
 				space.show_manipulator = isplaying
 				space.fx_settings.use_ssao = not isplaying
+				
 			# Normal Play
 			else :
 				space.show_only_render = False
@@ -717,28 +718,47 @@ class VIEW3D_HT_header_cenda(Header):
 	def draw(self, context):
 		
 		layout = self.layout
+		
 		row = layout.row(align=True)
 		row = layout.row(align=True)
 		
-		# buttons
+		# quad view
 		row.operator("screen.region_quadview", text = "Quad View", icon = "VIEW3D_VEC")
-		row = layout.row(align=True)
+	#	row = layout.row(align=True)
 		
 		# simplify
+	#	if(bpy.context.active_object.mode  == 'OBJECT'):
+			
 		state = bpy.context.scene.render.use_simplify
-
+		
 		if (state) :
 			current_icon = 'CHECKBOX_HLT'
 		else:
 			current_icon = 'CHECKBOX_DEHLT'
 			
 		row.operator("scene.simplify_toggle", icon = current_icon)
+			
+		# backface toggle	
+	#	else:
+			
+		state = bpy.context.space_data.show_backface_culling
+
+		if (state) :
+			current_icon = 'CHECKBOX_HLT'
+		else:
+			current_icon = 'CHECKBOX_DEHLT'
+		
+		row.operator("scene.backface_toggle", icon = current_icon)
+			
+		# export
 		row = layout.row(align=True)
 		
-		# export path must be filled
-	#	if( len(bpy.context.scene.ExportFBX) > 0 ):
+		if(bpy.context.active_object.mode  == 'OBJECT'):
+			row.enabled = True
+		else:
+			row.enabled = False
+
 		row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
-		row = layout.row(align=True)
 		
 		'''
 		# fluid bake
@@ -754,7 +774,7 @@ class BakeFluid(bpy.types.Operator):
 
 	bl_idname = "object.bake_fluid"
 	bl_label = "Bake Fluid"
-	bl_options = {'REGISTER', 'UNDO'}
+#	bl_options = {'REGISTER', 'UNDO'}
 
 	def execute(self, context):
 		bpy.ops.fluid.bake()
@@ -766,7 +786,7 @@ class SimplifyToggle(bpy.types.Operator):
 	'''Simplify Toggle'''
 	bl_idname = "scene.simplify_toggle"
 	bl_label = "Simplify"
-	bl_options = {'REGISTER', 'UNDO'}
+#	bl_options = {'REGISTER', 'UNDO'}
 
 	
 	def execute(self, context):
@@ -776,6 +796,21 @@ class SimplifyToggle(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
+class BackfaceToggle(bpy.types.Operator):
+
+	'''Backface'''
+	bl_idname = "scene.backface_toggle"
+	bl_label = "Culling"
+#	bl_options = {'REGISTER', 'UNDO'}
+
+	
+	def execute(self, context):
+
+		bpy.context.space_data.show_backface_culling = not bpy.context.space_data.show_backface_culling
+
+		return {'FINISHED'}
+		
+		
 ###########################################################
 class SetInOutRange(bpy.types.Operator):
 
@@ -848,7 +883,40 @@ class ParentObject(bpy.types.Operator):
 				
 		return {'FINISHED'}
 	
+	
+class ProportionalSwitcher(bpy.types.Operator):
 
+	'''Proportional Switcher'''
+	bl_idname = "scene.proportional_switcher"
+	bl_label = "Proportional Switcher"
+#	bl_options = {'REGISTER', 'UNDO'}
+
+	proportionalType = [
+#	("DISABLED", "DISABLED", "", "", 0),
+    ("ENABLED", "Enable", "", "", 0),
+	("PROJECTED", "Projected", "", "", 1),
+    ("CONNECTED", "Connected", "", "", 2)
+    ]
+
+	type = EnumProperty( name = "Type", description = "", items = proportionalType )
+	
+	def execute(self, context):
+		
+		# same is calling toggle
+		if( bpy.context.scene.tool_settings.proportional_edit != 'DISABLED' ):
+			bpy.context.scene.tool_settings.proportional_edit = 'DISABLED'
+			
+		elif( bpy.context.scene.tool_settings.proportional_edit == 'DISABLED' ): 
+			bpy.context.scene.tool_settings.proportional_edit = self.type
+			
+		else:
+			bpy.context.scene.tool_settings.proportional_edit = 'DISABLED'
+	
+		# TODO - add also DOPE and GRAPH
+		
+		return {'FINISHED'}
+	
+	
 #class SelectRecursiveAndShow(bpy.types.Operator):
 
 #	'''Select Recursive and Show'''
