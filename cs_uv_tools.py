@@ -33,7 +33,7 @@ from bpy.props import StringProperty, EnumProperty #, IntProperty, BoolProperty,
 #from bpy.types import Header, Panel
 
 
-# change object mode by selection			
+# edit mode type (UV or Sync)			
 class SmartUVMode(bpy.types.Operator):
 
 	'''Smart UV Mode'''
@@ -54,6 +54,7 @@ class SmartUVMode(bpy.types.Operator):
 			# VERTEX mode #
 			if(not bpy.context.tool_settings.use_uv_select_sync):
 				
+				# synchronize same component
 				if(bpy.context.scene.tool_settings.uv_select_mode == 'VERTEX'):
 					bpy.context.tool_settings.mesh_select_mode = (True, False, False)
 				
@@ -72,7 +73,8 @@ class SmartUVMode(bpy.types.Operator):
 				
 			#  UV mode #	
 			else:
-
+				
+				# synchronize same component
 				if(bpy.context.tool_settings.mesh_select_mode[0] ):
 					bpy.context.scene.tool_settings.uv_select_mode = 'VERTEX'
 					
@@ -96,43 +98,58 @@ class SmartUVComponentMode(bpy.types.Operator):
 	'''Smart UV Component Mode'''
 	bl_idname = "uv.smart_component_mode"
 	bl_label = "Smart UV Component Mode"
-	bl_options = {'REGISTER', 'UNDO'}
+#	bl_options = {'REGISTER', 'UNDO'}
 
 
 	ComponentTypeEnum = [
-		("Vertex", "Vertex", "", "", 0),
-	    ("Edge", "Edge", "", "", 100),
-		("Face", "Face", "", "", 200)
+		("VERTEX", "Vertex", "", "", 0),
+	    ("EDGE", "Edge", "", "", 100),
+		("FACE", "Face", "", "", 200),
+		("ISLAND", "Island", "", "", 300)
 	    ]
 	
 	component = EnumProperty( name = "Component", description = "", items=ComponentTypeEnum )
-
+	
 	
 	def execute(self, context):
 
+		# Component sync #
 		if( bpy.context.tool_settings.use_uv_select_sync ):
 			
-			if(self.component == 'Vertex'):
+			if(self.component == 'VERTEX'):
 				bpy.context.tool_settings.mesh_select_mode = (True, False, False)
 				
-			elif(self.component == 'Edge'):
+			elif(self.component == 'EDGE'):
 				bpy.context.tool_settings.mesh_select_mode = (False, True, False)
 				
-			elif(self.component == 'Face'):
+			elif(self.component == 'FACE'):
 				bpy.context.tool_settings.mesh_select_mode = (False, False, True)	
-				
+		
+		# Classic UV mode #
 		else:
 			
-			if(self.component == 'Vertex'):
-				bpy.context.scene.tool_settings.uv_select_mode = 'VERTEX'
-				
-			elif(self.component == 'Edge'):
-				bpy.context.scene.tool_settings.uv_select_mode = 'EDGE'
-				
-			elif(self.component == 'Face'):
-				bpy.context.scene.tool_settings.uv_select_mode = 'FACE'
-		
+		#	print( bpy.context.scene.tool_settings.uv_select_mode )
 			
+		
+			# vertex mode is also switcher
+			if( (context.scene.tool_settings.uv_select_mode == 'VERTEX') and (self.component == 'VERTEX') and (context.space_data.uv_editor.sticky_select_mode != 'DISABLED') ):
+				bpy.ops.uv.sticky_switch(stickyMode = 'DISABLED')
+				
+			else:
+				bpy.context.scene.tool_settings.uv_select_mode = self.component
+	
+				if(self.component == 'VERTEX'):
+					bpy.ops.uv.sticky_switch(stickyMode = 'SHARED_LOCATION')
+					
+				elif(self.component == 'EDGE'):
+					bpy.ops.uv.sticky_switch(stickyMode = 'SHARED_VERTEX')
+					
+				elif(self.component == 'FACE'):
+					bpy.ops.uv.sticky_switch(stickyMode = 'DISABLED')
+				
+				elif(self.component == 'ISLAND'):
+					bpy.ops.uv.sticky_switch(stickyMode = 'SHARED_LOCATION')
+				
 		return {'FINISHED'}
 
 
@@ -142,7 +159,7 @@ class StickyModeSwitch(bpy.types.Operator):
 	'''Switch Sticky Mode'''
 	bl_idname = "uv.sticky_switch"
 	bl_label = "Switch Sticky Mode"
-	bl_options = {'REGISTER', 'UNDO'}
+#	bl_options = {'REGISTER', 'UNDO'}
 
 
 	StickyModeEnum = [
