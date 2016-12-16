@@ -134,7 +134,10 @@ class SmartUVComponentMode(bpy.types.Operator):
 			# vertex mode is also switcher
 			if( (context.scene.tool_settings.uv_select_mode == 'VERTEX') and (self.component == 'VERTEX') and (context.space_data.uv_editor.sticky_select_mode != 'DISABLED') ):
 				bpy.ops.uv.sticky_switch(stickyMode = 'DISABLED')
-				
+			
+			elif( (context.scene.tool_settings.uv_select_mode == 'EDGE') and (self.component == 'EDGE') and (context.space_data.uv_editor.sticky_select_mode != 'SHARED_LOCATION') ):
+				bpy.ops.uv.sticky_switch(stickyMode = 'SHARED_LOCATION')
+					
 			else:
 				bpy.context.scene.tool_settings.uv_select_mode = self.component
 	
