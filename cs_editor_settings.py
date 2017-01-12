@@ -69,7 +69,8 @@ class SetEditorSettings(bpy.types.Operator):
 					
 				elif(space.type == 'VIEW_3D'):
 					space.use_occlude_geometry = True
-				
+					space.show_relationship_lines = False
+
 				elif(space.type == 'IMAGE_EDITOR'):
 					space.uv_editor.show_other_objects = True
 					
