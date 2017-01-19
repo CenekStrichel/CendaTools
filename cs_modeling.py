@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Modeling Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
+	"version": (1, 0, 1),
 	"blender": (2, 78, 0),
 	"location": "Hotkeys",
 	"description": "Combined modeling tools",
@@ -96,8 +96,8 @@ class Tool_2(bpy.types.Operator):
 			numberOfVertices = NumberOfVertices()
 			
 			# DISSOLVE ONE VERTEX #
-			if(numberOfVertices == 1):
-				bpy.context.window_manager.popup_menu(DissolveConfirm, title="Confirm", icon='INFO')
+		#	if(numberOfVertices == 1):
+		#		bpy.context.window_manager.popup_menu(DissolveConfirm, title="Confirm", icon='INFO')
 				
 			# CONNECT VERTICES #	
 			if(numberOfVertices >= 2):	
@@ -110,6 +110,9 @@ class Tool_2(bpy.types.Operator):
 			bpy.ops.mesh.dissolve_mode(True, use_verts=True)
 
 
+		elif( ActiveComponent() == 'FACE' ):
+			bpy.ops.wm.call_menu( 'INVOKE_DEFAULT', name = "VIEW3D_MT_uv_map" )
+			
 		return {'FINISHED'}
 	
 	
