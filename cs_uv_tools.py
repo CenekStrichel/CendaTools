@@ -33,12 +33,12 @@ from bpy.props import StringProperty, EnumProperty #, IntProperty, BoolProperty,
 #from bpy.types import Header, Panel
 
 
-# edit mode type (UV or Sync)			
-class SmartUVMode(bpy.types.Operator):
+# Only switch between modes (UV and Vertex) with remain settings component	
+class SmartSwitchUVMode(bpy.types.Operator):
 
 	'''Smart UV Mode'''
-	bl_idname = "uv.smart_mode"
-	bl_label = "Smart UV Mode"
+	bl_idname = "uv.smart_switch_mode"
+	bl_label = "Smart Switch UV Mode"
 	bl_options = {'REGISTER', 'UNDO'}
 
 
@@ -51,7 +51,7 @@ class SmartUVMode(bpy.types.Operator):
 		# switch between sync mode	
 		else:
 			
-			# VERTEX mode #
+			# UV MODE #
 			if(not bpy.context.tool_settings.use_uv_select_sync):
 				
 				# synchronize same component
@@ -71,7 +71,7 @@ class SmartUVMode(bpy.types.Operator):
 				
 				bpy.ops.mesh.select_all(action='DESELECT') # deselect all because it is not needed
 				
-			#  UV mode #	
+			#  VERTEX VIEW 3D SYNC #	
 			else:
 				
 				# synchronize same component
@@ -83,13 +83,10 @@ class SmartUVMode(bpy.types.Operator):
 					
 				elif(bpy.context.tool_settings.mesh_select_mode[2] ):
 					bpy.context.scene.tool_settings.uv_select_mode = 'FACE'
-					
 
 				bpy.context.tool_settings.use_uv_select_sync = False
-
 				bpy.ops.mesh.select_all(action='SELECT') # select all for show all UV
-		
-			
+	
 		return {'FINISHED'}
 	
 	
@@ -127,18 +124,22 @@ class SmartUVComponentMode(bpy.types.Operator):
 		
 		# Classic UV mode #
 		else:
-			
-		#	print( bpy.context.scene.tool_settings.uv_select_mode )
-			
-		
+
 			# vertex mode is also switcher
 			if( (context.scene.tool_settings.uv_select_mode == 'VERTEX') and (self.component == 'VERTEX') and (context.space_data.uv_editor.sticky_select_mode != 'DISABLED') ):
 				bpy.ops.uv.sticky_switch(stickyMode = 'DISABLED')
 			
 			elif( (context.scene.tool_settings.uv_select_mode == 'EDGE') and (self.component == 'EDGE') and (context.space_data.uv_editor.sticky_select_mode != 'SHARED_LOCATION') ):
 				bpy.ops.uv.sticky_switch(stickyMode = 'SHARED_LOCATION')
-					
+			
+			# Face / Island switch
+			elif( (context.scene.tool_settings.uv_select_mode == 'FACE') and (self.component == 'FACE') ):
+				bpy.ops.uv.sticky_switch(stickyMode = 'SHARED_LOCATION')
+				bpy.context.scene.tool_settings.uv_select_mode = 'ISLAND'
+				
 			else:
+				
+				# setting for all
 				bpy.context.scene.tool_settings.uv_select_mode = self.component
 	
 				if(self.component == 'VERTEX'):
