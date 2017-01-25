@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Offset Animation",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 78, 0),
 	"location": "Tools > Offset Animation",
 	"description": "Offset for animated object and bones",
@@ -29,7 +29,7 @@ bl_info = {
 	
 
 import bpy
-from bpy.props import BoolProperty, FloatVectorProperty, FloatProperty
+from bpy.props import BoolProperty, FloatVectorProperty, FloatProperty, IntProperty
 from mathutils import *
 from math import *
 
@@ -50,11 +50,15 @@ class OffsetAnimationPanel(bpy.types.Panel):
 	bpy.types.Scene.showSetOffset = BoolProperty(name="ShowSetOffset",default=False) # is reference setted?
 	bpy.types.Scene.autokeySetting = BoolProperty(name="AutoKey",default=True) # previous setting for autokey
 	
+	bpy.types.Scene.UseRange = BoolProperty(name="Use Range",default=False) 
+	bpy.types.Scene.StartRange = IntProperty(name = "Start", default = 10)
+	bpy.types.Scene.EndRange = IntProperty(name = "End", default = 50)
 	
 	
 	def draw(self, context):
 		
 		layout = self.layout
+		scn = context.scene
 		
 		# First button
 		row = layout.row(align=True)
@@ -67,13 +71,51 @@ class OffsetAnimationPanel(bpy.types.Panel):
 		row.operator("anim.offset_animation_set", icon = "POSE_DATA", text="Offset").reference = False
 		
 		if( context.scene.showSetOffset ):
-		#	ahoj.active = True
 			row.enabled = True
-		else:	
-		#	ahoj.active = False
+		else:
 			row.enabled = False	
 		
+	#	row = layout.row(align=True)
+ 	#	row = layout.row(align=True)
 		
+		box = layout.box()
+		row = box.row(align=True)
+		
+		row.prop( scn, "UseRange" )
+		
+		if(scn.UseRange):
+
+			row = box.row(align=True)
+
+			row.prop( scn, "StartRange" )
+			row.operator("anim.offset_pick_time", text="", icon = 'EYEDROPPER').start = True
+			
+			row = box.row(align=True)
+			row.prop( scn, "EndRange" )
+			row.operator("anim.offset_pick_time", text="", icon = 'EYEDROPPER').start = False
+		
+		
+class PickRangeTime(bpy.types.Operator):
+	
+	"""Pick time from Timeline"""
+	bl_idname = "anim.offset_pick_time"
+	bl_label = "Offset Animation Pick"
+
+	start = BoolProperty(name="Start",default=True)
+
+	def execute(self, context):
+		
+		scn = context.scene
+		
+		if(self.start):
+			scn.StartRange = scn.frame_current
+			
+		else:
+			scn.EndRange = scn.frame_current
+		
+		return {'FINISHED'}
+	
+				
 ################################################################
 class OffsetAnimationSet(bpy.types.Operator):
 
@@ -102,8 +144,7 @@ class OffsetAnimationSet(bpy.types.Operator):
 		bpy.types.Scene.SclStart = FloatVectorProperty( name = "SclStart", description = "")
 		bpy.types.Scene.SclEnd = FloatVectorProperty( name = "SclEnd", description = "")
 		bpy.types.Scene.SclDifference = FloatVectorProperty( name = "SclDifference", description = "")
-		
-
+	
 		# you need bone with action
 		if(context.object.animation_data.action == None):
 			self.report({'ERROR'},"No Action for Offset Found")
@@ -328,12 +369,22 @@ def OffsetAnimation( selected ):
 
 def CurveOffset(action, index, offset, numKeyframes):
 	
+	scn = bpy.context.scene
+	
 	for j in range(numKeyframes):
-		action.fcurves[ index ].keyframe_points[ j ].co.y -= offset
-		action.fcurves[ index ].keyframe_points[ j ].handle_left.y -= offset
-		action.fcurves[ index ].keyframe_points[ j ].handle_right.y -= offset				
-			
-			
+		
+		key = action.fcurves[ index ].keyframe_points[ j ]
+		
+		if( scn.UseRange ):
+			if( (key.co.x >= scn.StartRange) and (key.co.x <= scn.EndRange) ):
+				key.co.y -= offset
+				key.handle_left.y -= offset
+				key.handle_right.y -= offset
+		else:
+			key.co.y -= offset
+			key.handle_left.y -= offset
+			key.handle_right.y -= offset
+				
 			
 ################################################################
 # register #
