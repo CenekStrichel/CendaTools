@@ -165,8 +165,12 @@ class OffsetAnimationSet(bpy.types.Operator):
 
 		SaveRemoveOffset( self, context, currentLocation, currentRotation, currentScale, selected, currentQRotation )
 
-		#	break # only first bone
-			
+		# update motions paths if displayed
+		try:
+			bpy.ops.pose.paths_update()
+		except:
+			pass
+		
 		return {'FINISHED'}
 
 
