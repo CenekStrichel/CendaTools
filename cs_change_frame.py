@@ -56,7 +56,7 @@ class ChangeFrame(bpy.types.Operator):
 	global mouseOffset
 	global sensitivity
 	global previousManipulator
-
+	global previousOnlyRender
 
 	def modal(self, context, event):
 	
@@ -84,7 +84,8 @@ class ChangeFrame(bpy.types.Operator):
 			
 			# previous viewport setting
 			bpy.context.space_data.show_manipulator = self.previousManipulator
-			
+			bpy.context.space_data.show_only_render = self.previousOnlyRender
+
 			# cursor back
 			bpy.context.window.cursor_set("DEFAULT")
 			
@@ -98,6 +99,10 @@ class ChangeFrame(bpy.types.Operator):
 		# hide viewport helpers
 		self.previousManipulator = bpy.context.space_data.show_manipulator
 		bpy.context.space_data.show_manipulator = False
+		
+		self.previousOnlyRender = bpy.context.space_data.show_only_render
+		bpy.context.space_data.show_only_render = True
+		
 		
 		# start modal
 		self.frameOffset = bpy.context.scene.frame_current 
