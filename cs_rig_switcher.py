@@ -519,10 +519,28 @@ def HideLODs( state = True ):
 		child.name.endswith("_LOD5")
 		):
 			if(state):
+				
 				child.hide = True
 				
+				try:
+					# decimate first
+					child.modifiers["Decimate"].show_viewport = False
+					child.modifiers["Armature"].show_viewport = False
+					
+				except:
+					pass
+
 			else:
+				
 				child.hide = False
+				
+				try:
+					# decimate first
+					child.modifiers["Decimate"].show_viewport = True
+					child.modifiers["Armature"].show_viewport = True
+					
+				except:
+					pass
 
 
 class WireAllMeshes(bpy.types.Operator):
