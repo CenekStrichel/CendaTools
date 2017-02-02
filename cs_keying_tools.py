@@ -271,17 +271,43 @@ class AutoIK(bpy.types.Operator):
 class DOPESHEETKeyingButtons(Header):
 	
 	bl_space_type = 'DOPESHEET_EDITOR'
-
+	
+	
+	bpy.types.Scene.AutoKeyOffset = BoolProperty(
+	name = "Auto",
+	default = True,
+	description = "Offset is taken by Frame Range")
+	
+	
+	bpy.types.Scene.KeyOffset = IntProperty(
+	name = "",
+	default = 0,
+	soft_min = 0,
+	soft_max = 100,
+	description = "Offset key is setted by user")
+	
+	
 	def draw(self, context):
 		
 		layout = self.layout
 		row = layout.row(align = True)
-
-		if( context.space_data.dopesheet.show_only_selected ):
-			row.label( icon = "POSE_DATA", text = "Locomotion" )
-			row.operator( "action.locomotion" , text = "Offseted").offset = True
-			row.operator( "action.locomotion" , text = "No Offset").offset = False
+		scn = context.scene
 		
+		if( context.space_data.dopesheet.show_only_selected ):
+			
+			row.label( icon = "POSE_DATA", text = "Mirror" )
+			
+			# toggle
+			row.prop( scn, "AutoKeyOffset" )
+			
+			# set value for offset
+			if(not scn.AutoKeyOffset):
+				row.prop( scn, "KeyOffset" )
+				
+			# offset!
+			row.operator( "action.locomotion" , text = "Offset")
+
+		# Mirror
 		col = layout.column()
 		row = col.row(align = True)
 		row.operator( "action.animation_mirror" , icon = "MOD_MIRROR")	
@@ -295,17 +321,18 @@ class DOPESHEETKeyingButtons(Header):
 # copy and flip pose in one step
 class Locomotion(bpy.types.Operator):
 
-#	'''Copy and Paste animation flipped with offset'''
+
+	'''Copy and Paste mirror animation (All visible keyframes)'''
 	bl_idname = "action.locomotion"
 	bl_label = "Locomotion"
 	bl_options = {'REGISTER', 'UNDO'}
 
-	offset = BoolProperty(name="Offset",default=True)
 
 	def execute(self, context):
 		
-		obj = bpy.context.object
-	
+		obj = context.object
+		scn = context.scene
+		
 		if(obj.animation_data != None and obj.animation_data.action != None):
 			
 			SelectAllKeyframes()
@@ -314,25 +341,32 @@ class Locomotion(bpy.types.Operator):
 
 			# copy
 			bpy.ops.action.copy()
-		 
 			bpy.ops.pose.select_mirror(extend=False) # select flipped
 			bpy.ops.pose.key_all_unlocked() # i need some key
 			
 			# paste
 			bpy.ops.action.paste(merge='OVER_ALL', flipped=True, offset='NONE' )
 			bpy.ops.action.extrapolation_type(type='MAKE_CYCLIC')
-			
+	
 			# keyframe are offseted
-			if(self.offset):
-				
+			if(scn.AutoKeyOffset):
+			
 				# move keyframes # I can not detect last frame, because last frame doesn`t mean end of cycle
 				if( bpy.context.scene.use_preview_range ) :
 					frameOffset = bpy.context.scene.frame_preview_end / 2
 				else :
 					frameOffset = bpy.context.scene.frame_end / 2
 					
-				# offset move	
-				bpy.ops.transform.transform(mode='TIME_TRANSLATE', value=(frameOffset, 0, 0, 0), axis=(0, 0, 0), constraint_axis=(False, False, False), constraint_orientation='GLOBAL')
+			else:
+				frameOffset = scn.KeyOffset
+		
+			# offset move	
+			bpy.ops.transform.transform(
+			mode='TIME_TRANSLATE', 
+			value=(frameOffset, 0, 0, 0), 
+			axis=(0, 0, 0), 
+			constraint_axis=(False, False, False), 
+			constraint_orientation='GLOBAL')
 
 	        # select previous objects
 			bpy.ops.pose.select_mirror(extend=False) # select flipped
@@ -347,9 +381,9 @@ class Locomotion(bpy.types.Operator):
 # copy and flip pose in one step
 class MirrorAnimation(bpy.types.Operator):
 
-	'''Flipping whole animation by X'''
+	'''Flipping whole animation by X (All visible keyframes)'''
 	bl_idname = "action.animation_mirror"
-	bl_label = "Mirror Action"
+	bl_label = "Whole Action"
 	bl_options = {'REGISTER', 'UNDO'}
 
 	def execute(self, context):
