@@ -722,13 +722,11 @@ class VIEW3D_HT_header_cenda(Header):
 		row = layout.row(align=True)
 		row = layout.row(align=True)
 		
+		#################################################
 		# quad view
 		row.operator("screen.region_quadview", text = "Quad View", icon = "VIEW3D_VEC")
-	#	row = layout.row(align=True)
 		
-		# simplify
-	#	if(bpy.context.active_object.mode  == 'OBJECT'):
-			
+		# simplify			
 		state = bpy.context.scene.render.use_simplify
 		
 		if (state) :
@@ -738,9 +736,9 @@ class VIEW3D_HT_header_cenda(Header):
 			
 		row.operator("scene.simplify_toggle", icon = current_icon)
 			
-		# backface toggle	
-	#	else:
-			
+		#################################################	
+		# culling	
+		row = layout.row(align=True)	
 		state = bpy.context.space_data.show_backface_culling
 
 		if (state) :
@@ -749,7 +747,13 @@ class VIEW3D_HT_header_cenda(Header):
 			current_icon = 'CHECKBOX_DEHLT'
 		
 		row.operator("scene.backface_toggle", icon = current_icon)
-			
+
+		# texture	
+		if( context.scene.render.engine == "BLENDER_RENDER" and context.object.type == "MESH"):
+			row.operator("scene.texture_toggle")
+		
+		
+		#################################################
 		# export
 		row = layout.row(align=True)
 		
@@ -759,6 +763,7 @@ class VIEW3D_HT_header_cenda(Header):
 			row.enabled = False
 
 		row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
+		
 		
 		'''
 		# fluid bake
@@ -780,6 +785,7 @@ class BakeFluid(bpy.types.Operator):
 		bpy.ops.fluid.bake()
 		return {'FINISHED'}
 '''		
+
 
 class SimplifyToggle(bpy.types.Operator):
 
@@ -811,6 +817,23 @@ class BackfaceToggle(bpy.types.Operator):
 		return {'FINISHED'}
 		
 		
+		
+class TextureToggle(bpy.types.Operator):
+
+	'''Texture Toggle'''
+	bl_idname = "scene.texture_toggle"
+	bl_label = "Texture"
+#	bl_options = {'REGISTER', 'UNDO'}
+
+	
+	def execute(self, context):
+
+		# hardcoded for now (for normal maps)
+		context.object.active_material.use_textures[1] = not context.object.active_material.use_textures[1]
+
+		return {'FINISHED'}
+	
+			
 ###########################################################
 class SetInOutRange(bpy.types.Operator):
 
