@@ -21,10 +21,10 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 3),
+	"version": (1, 0, 4),
 	"blender": (2, 78, 0),
 	"location": "Export settings in Scene Properties, Export button in Header View3D",
-	"description": "Export selected objects to destination (FBX)",
+	"description": "Export selected objects to destination (FBX) with override per object",
 	"category": "Cenda Tools"}
 	
 
@@ -130,14 +130,25 @@ class ExportToPlacePanel(bpy.types.Panel):
 		# Export
 		box = layout.box()
 		
-		box.label("Export Paths")
-		box.prop( scn, "ExportPath", text = "" )
+		# only first override is used
+		override = False
+		
+		for obj in bpy.context.selected_objects:
+			if( obj.ExportOverride ):
+				override = True
+				box.label("Export Override")
+				box.label( obj.ExportPathOverride )
+				break
+				
+		if(not override):
+			box.label("Export Paths")
+			box.prop( scn, "ExportPath", text = "" )
 
-		# Backup
-		box.prop( scn, "Backup" )
+			# Backup
+			box.prop( scn, "Backup" )
 
-		if(scn.Backup):
-			box.prop( scn, "BackupPath", text = ""  )
+			if(scn.Backup):
+				box.prop( scn, "BackupPath", text = ""  )
 
 		# Export button
 		row = layout.row(align=True)
@@ -191,6 +202,8 @@ class ExportToPlace(bpy.types.Operator):
 		else:
 			extension = ".blend"	
 			
+		overrideActive = False
+		
 		# Override export object
 		for obj in bpy.context.selected_objects:
 			if( obj.ExportOverride ):
@@ -198,6 +211,7 @@ class ExportToPlace(bpy.types.Operator):
 					obj.ExportPathOverride += extension # save to settings
 
 				exportPath = obj.ExportPathOverride # BUG, blend is not added
+				overrideActive = True
 				break
 			
 		# deselect all blacklisted
@@ -291,8 +305,6 @@ class ExportToPlace(bpy.types.Operator):
 				except:
 					self.report({'ERROR'}, ("You need install Export Selected add-on!") )
 					return{'FINISHED'}
-
-			self.report({'INFO'}, ("Exported to " + exportPath) )
 			
 		else:
 			self.report({'ERROR'}, ("No export path found") )
@@ -300,7 +312,7 @@ class ExportToPlace(bpy.types.Operator):
 		
 		
 		# BACKUP #
-		if( scn.Backup ):
+		if( scn.Backup and not overrideActive ):
 
 			backupPath = scn.BackupPath
 			
@@ -319,7 +331,12 @@ class ExportToPlace(bpy.types.Operator):
 			
 			# duplicate exported FBX	
 			copyfile(exportPath, backupPath)
-
+			
+			self.report({'INFO'}, ("Exported to " + exportPath + " | Backup to " + backupPath) )
+			
+		else:
+			self.report({'INFO'}, ("Exported to " + exportPath) )
+			
 		return{'FINISHED'} 
 
 
