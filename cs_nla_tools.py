@@ -31,8 +31,6 @@ import bpy
 from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
 from bpy.types import Header, Panel
 
-
-
 	
 ################	
 class NLAToolsButtons(Header):
@@ -52,21 +50,35 @@ class NLAToolsButtons(Header):
 	description = "Changes with Tweak mode", 
 	items=tweakModeEnum )
 	
+	bpy.types.Scene.NLAIsolate = BoolProperty( 
+	name = "", 
+	default = True, 
+	description = "Isolate with Tweak mode")
+	
 	
 	def draw(self, context):
 		
 		layout = self.layout
 		col = layout.column()
+
 		col = layout.column()
 		row = col.row(align = True)
-
-		row.operator( "nla.cut_strip" , icon = "NLA")	
+		
+		scn = context.scene
+		
+		if(scn.NLAIsolate):
+			newIcon = "SOLO_ON"
+		else:
+			newIcon = "SOLO_OFF"
+			
+		row.prop(scn, "NLAIsolate", icon = newIcon )
+		row.prop(scn, "NLATweakMode" )
 		
 		col = layout.column()
 		row = col.row(align = True)
-		row.prop(context.scene, "NLATweakMode" )
-
-				
+		row.operator( "nla.cut_strip" , icon = "NLA")			
+		
+			
 ################
 # CUT STRIP #
 ################
@@ -83,6 +95,7 @@ class CutStrip(bpy.types.Operator):
 
 		try:
 		    selected_strips = [strip for strip in bpy.context.object.animation_data.nla_tracks.active.strips if strip.select]
+		
 		except AttributeError:
 		    selected_strips = []
 
@@ -103,7 +116,9 @@ class CutStrip(bpy.types.Operator):
 		return {'FINISHED'}	
 	
 	
+###################
 # NLA Tweak mode #
+##################
 class NLATweakRangeToggle(bpy.types.Operator):
 
 
@@ -119,7 +134,7 @@ class NLATweakRangeToggle(bpy.types.Operator):
 		# Enter #
 		if( not bpy.context.scene.is_nla_tweakmode ):
 			
-			bpy.ops.nla.tweakmode_enter()
+			bpy.ops.nla.tweakmode_enter( isolate_action = scn.NLAIsolate )
 
 			# Range by NLA
 			if( scn.NLATweakMode == 'PreviewRange' or scn.NLATweakMode == 'PreviewView' ):
@@ -139,12 +154,12 @@ class NLATweakRangeToggle(bpy.types.Operator):
 		# Exit # TODO: not working
 		else:
 			
-			bpy.ops.nla.tweakmode_exit()
+			bpy.ops.nla.tweakmode_exit(isolate_action = scn.NLAIsolate)
 			
 			if( scn.NLATweakMode == 'PreviewRange' or scn.NLATweakMode == 'PreviewView' ):
 				bpy.context.scene.use_preview_range = False
 				
-		#	bpy.ops.nla.view_selected()
+			bpy.ops.nla.view_selected() # needed for return back
 
 		return {'FINISHED'}
 
@@ -154,6 +169,7 @@ def FrameForEditor( currentArea, testedArea ):
 	if currentArea.type == testedArea:
 		for region in currentArea.regions:
 			if region.type == 'WINDOW':
+				
 				ctx = bpy.context.copy()
 				ctx[ 'area'] = currentArea
 				ctx['region'] = region
