@@ -567,20 +567,6 @@ class JoinObjectsWithUV(bpy.types.Operator):
 		
 
 	
-################	
-class NLAToolsButtons(Header):
-	
-	bl_space_type = 'NLA_EDITOR'
-
-	def draw(self, context):
-		
-		layout = self.layout
-		col = layout.column()
-		col = layout.column()
-		row = col.row(align = True)
-
-		row.operator( "nla.cut_strip" , icon = "NLA")	
-
 
 ################
 class TextToolsButtons(Header):
@@ -613,80 +599,6 @@ class ShowAllOp(bpy.types.Operator):
 	def execute(self, context):
 		bpy.app.debug_wm = not bpy.app.debug_wm
 		return {'FINISHED'}	
-	
-				
-################
-# CUT STRIP #
-################
-# copy and flip pose in one step
-class CutStrip(bpy.types.Operator):
-
-	'''Cut strip by scene setting'''
-	bl_idname = "nla.cut_strip"
-	bl_label = "Cut Strip"
-	bl_options = {'REGISTER', 'UNDO'}
-
-	
-	def execute(self, context):
-
-		try:
-		    selected_strips = [strip for strip in bpy.context.object.animation_data.nla_tracks.active.strips if strip.select]
-		except AttributeError:
-		    selected_strips = []
-
-		if bpy.context.scene.use_preview_range :
-			
-			startFrame = bpy.context.scene.frame_preview_start
-			endFrame = bpy.context.scene.frame_preview_end
-
-			for strip in selected_strips :
-				strip.action_frame_start = startFrame
-				strip.action_frame_end = endFrame
-				
-		# redraw 
-		for area in bpy.context.screen.areas:
-			if area.type == 'NLA_EDITOR':
-				area.tag_redraw()
-			
-		return {'FINISHED'}	
-	
-	
-# NLA Tweak mode #
-class NLATweakRangeToggle(bpy.types.Operator):
-
-	'''Tweak and Range Toggle'''
-	bl_idname = "nla.tweak_and_range"
-	bl_label = "Tweak and Range Toggle"
-
-
-	preview = BoolProperty(name="Set Preview",default=True)
-	
-	
-	def execute(self, context):
-		
-		# Enter #
-		if( not bpy.context.scene.is_nla_tweakmode ):
-			
-			bpy.ops.nla.tweakmode_enter()
-			
-			if(self.preview):
-				bpy.ops.nla.previewrange_set()
-			
-			# set timeline to frame range
-			for area in bpy.context.screen.areas:
-				
-				FrameForEditor( area, 'TIMELINE')
-				FrameForEditor( area, 'DOPESHEET_EDITOR')
-				FrameForEditor( area, 'GRAPH_EDITOR')
-				bpy.ops.nla.view_selected()
-
-		# Exit # TODO: not working
-		else:
-			bpy.ops.nla.tweakmode_exit()
-			bpy.context.scene.use_preview_range = False
-			bpy.ops.nla.view_selected()
-
-		return {'FINISHED'}
 
 
 def FrameForEditor( currentArea, testedArea ):
@@ -761,9 +673,19 @@ class VIEW3D_HT_header_cenda(Header):
 			row.enabled = True
 		else:
 			row.enabled = False
-
-		row.operator("cenda.export_to_place", icon = "EXPORT", text = "Export")
+			
+		# only first override is used
+		textExport = context.scene.ExportPath.rsplit('\\', 1)[-1]
+	#	icon = "EXPORT"
 		
+		for obj in bpy.context.selected_objects:
+			if( obj.ExportOverride ):
+				textExport = "[ " + context.object.ExportPathOverride.rsplit('\\', 1)[-1] + " ]"	
+			#	icon = "PMARKER_ACT"
+				break
+			
+		if(len(textExport) > 0):
+			row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
 		
 		'''
 		# fluid bake
