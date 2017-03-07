@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "IK Setup",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 77, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 78, 0),
 	"location": "Pose > Inverse Kinematics > Add IK to Bone with Auto Chain",
 	"description": "Easier IK Setup",
 	"category": "Cenda Tools"}
@@ -46,6 +46,7 @@ class AddIkChain(bpy.types.Operator):
 
 	autoChainLength = BoolProperty(name="Auto Chain Length", default=True)
 	chainLength = IntProperty(name="Chain Length", default=2, min = 0)
+	ikProperties = BoolProperty(name="IK Blend Properties", default=True)
 #	poleAngle = FloatProperty(name="Pole Angle", default=0, min = -180, max = 180)
 	
 	
@@ -76,47 +77,52 @@ class AddIkChain(bpy.types.Operator):
 			bpy.context.active_pose_bone.constraints["IK"].chain_count = self.chainLength
 		
 		
-		# driver and target
-		bones = bpy.context.selected_pose_bones
-		i = 0
+		#####################
+		# IK CUSTOM SETTING #
+		#####################
+		# driver and target #
+		if(self.ikProperties):
+			
+			bones = bpy.context.selected_pose_bones
+			i = 0
 
-		for bone in bones:
-			
-			i+=1
-			
-			# TODO - order is not preserved :(
-			
-		#	if( len(bones) == 3 and i == 3 ):
-		#		ikConstrBone = bone
+			for bone in bones:
 				
-		#	if( len(bones) == 3 and i == 2 ):
-		#		targetBone = bone
+				i+=1
+				
+				# TODO - order is not preserved :(
+				
+			#	if( len(bones) == 3 and i == 3 ):
+			#		ikConstrBone = bone
+					
+			#	if( len(bones) == 3 and i == 2 ):
+			#		targetBone = bone
 
-			if( len(bones) == 2 and i == 2 ):
-				ikConstrBone = bone
-			
-			if( i == 1 ): # first selected
-				bone["IK"] = 1.0
-				bone["_RNA_UI"] = {}
-				bone["_RNA_UI"]["IK"] = {"min":0.0,"max": 1.0,"soft_min":0.0,"soft_max":1.0}
-				ikHandleBone = bone
+				if( len(bones) == 2 and i == 2 ):
+					ikConstrBone = bone
+				
+				if( i == 1 ): # first selected
+					bone["IK"] = 1.0
+					bone["_RNA_UI"] = {}
+					bone["_RNA_UI"]["IK"] = {"min":0.0,"max": 1.0,"soft_min":0.0,"soft_max":1.0}
+					ikHandleBone = bone
 
-#		if( len(bones) == 3):
-#			ikConstrBone.constraints["IK"].pole_target = bpy.context.active_object
-#			ikConstrBone.constraints["IK"].pole_subtarget = targetBone.name
-#			ikConstrBone.constraints["IK"].pole_angle = math.radians( self.poleAngle )
+	#		if( len(bones) == 3):
+	#			ikConstrBone.constraints["IK"].pole_target = bpy.context.active_object
+	#			ikConstrBone.constraints["IK"].pole_subtarget = targetBone.name
+	#			ikConstrBone.constraints["IK"].pole_angle = math.radians( self.poleAngle )
+				
+			# add driver	
+			driv = ikConstrBone.constraints["IK"].driver_add( 'influence' )
+			driv.driver.expression = "var"
 			
-		# add driver	
-		driv = ikConstrBone.constraints["IK"].driver_add( 'influence' )
-		driv.driver.expression = "var"
-		
-		# variable
-		var = driv.driver.variables.new()
-		var.name = 'var'
-		var.type = 'SINGLE_PROP'
-		
-		var.targets[0].id = bpy.context.object
-		var.targets[0].data_path = 'pose.bones["'+ikHandleBone.name+'"]["IK"]'
+			# variable
+			var = driv.driver.variables.new()
+			var.name = 'var'
+			var.type = 'SINGLE_PROP'
+			
+			var.targets[0].id = bpy.context.object
+			var.targets[0].data_path = 'pose.bones["'+ikHandleBone.name+'"]["IK"]'
 
 		
 		return {'FINISHED'}
