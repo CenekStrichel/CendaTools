@@ -64,7 +64,7 @@ def switchLayout(self, context):
 		totalWidth = totalWidth + area.width
 	
 	# my home station (1 monitor)
-	if( totalWidth <= 6000 ):
+	if( totalWidth <= 8000 ):
 		row = layout.row(align=True)
 		row.operator(SwitchLatout.bl_idname, text = "Generic").layoutName = "_1 Generic"
 		row.operator(SwitchLatout.bl_idname, text = "Animation").layoutName = "_2 Animation"
