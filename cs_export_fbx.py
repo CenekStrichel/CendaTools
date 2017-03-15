@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 4),
+	"version": (1, 0, 5),
 	"blender": (2, 78, 0),
 	"location": "Export settings in Scene Properties, Export button in Header View3D",
 	"description": "Export selected objects to destination (FBX) with override per object",
@@ -340,14 +340,43 @@ class ExportToPlace(bpy.types.Operator):
 		return{'FINISHED'} 
 
 
+def ExportLayout(self, context):
+
+	#################################################
+	# export
+	layout = self.layout
+	row = layout.row(align=True)
+	
+	if(bpy.context.active_object.mode  == 'OBJECT'):
+		row.enabled = True
+	else:
+		row.enabled = False
+		
+	# only first override is used
+	textExport = context.scene.ExportPath.rsplit('\\', 1)[-1]
+#	icon = "EXPORT"
+	
+	for obj in bpy.context.selected_objects:
+		if( obj.ExportOverride ):
+			textExport = "[ " + context.object.ExportPathOverride.rsplit('\\', 1)[-1] + " ]"	
+		#	icon = "PMARKER_ACT"
+			break
+		
+	if(len(textExport) > 0):
+		row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
+
+		
+		
 ################################################################
 # register #
 ############
 def register():
 	bpy.utils.register_module(__name__)
+	bpy.types.VIEW3D_HT_header.prepend(ExportLayout)
 	
 def unregister():
 	bpy.utils.unregister_module(__name__)
+	bpy.types.VIEW3D_HT_header(ExportLayout)
 	
 if __name__ == "__main__":
 	register()
