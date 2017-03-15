@@ -664,7 +664,7 @@ class VIEW3D_HT_header_cenda(Header):
 		if( context.scene.render.engine == "BLENDER_RENDER" and context.object.type == "MESH"):
 			row.operator("scene.texture_toggle")
 		
-		
+		'''
 		#################################################
 		# export
 		row = layout.row(align=True)
@@ -686,7 +686,7 @@ class VIEW3D_HT_header_cenda(Header):
 			
 		if(len(textExport) > 0):
 			row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
-		
+		'''
 		'''
 		# fluid bake
 		obj = bpy.context.active_object
