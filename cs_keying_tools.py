@@ -273,6 +273,12 @@ class DOPESHEETKeyingButtons(Header):
 	bl_space_type = 'DOPESHEET_EDITOR'
 	
 	
+	bpy.types.Scene.SelectGroup = BoolProperty(
+	name = "Group",
+	default = True,
+	description = "Offset whole group")
+	
+	
 	bpy.types.Scene.AutoKeyOffset = BoolProperty(
 	name = "Auto",
 	default = True,
@@ -286,7 +292,7 @@ class DOPESHEETKeyingButtons(Header):
 	soft_max = 100,
 	description = "Offset key is setted by user")
 	
-	
+
 	def draw(self, context):
 		
 		layout = self.layout
@@ -296,6 +302,9 @@ class DOPESHEETKeyingButtons(Header):
 		if( context.space_data.dopesheet.show_only_selected ):
 			
 			row.label( icon = "POSE_DATA", text = "Mirror" )
+			
+			# select group
+			row.prop( scn, "SelectGroup" )
 			
 			# toggle
 			row.prop( scn, "AutoKeyOffset" )
@@ -332,8 +341,12 @@ class Locomotion(bpy.types.Operator):
 		
 		obj = context.object
 		scn = context.scene
-		
+	
 		if(obj.animation_data != None and obj.animation_data.action != None):
+			
+			# select whole group for mirror offset
+			if(scn.SelectGroup):
+				bpy.ops.pose.select_grouped(type='GROUP')
 			
 			SelectAllKeyframes()
 			
@@ -383,7 +396,7 @@ class MirrorAnimation(bpy.types.Operator):
 
 	'''Flipping whole animation by X (All visible keyframes)'''
 	bl_idname = "action.animation_mirror"
-	bl_label = "Whole Action"
+	bl_label = "Mirror Action"
 	bl_options = {'REGISTER', 'UNDO'}
 
 	def execute(self, context):
