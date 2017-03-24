@@ -64,6 +64,7 @@ class RenderDebugPanel(bpy.types.Panel):
 		# warning #
 		if( w_simplify or w_resolution or w_device or w_layer ):
 
+			# Problem! #
 			if( w_simplify ):
 				row = box.row()
 				row.label(" Simplify is Enabled", icon="CANCEL")
@@ -71,22 +72,40 @@ class RenderDebugPanel(bpy.types.Panel):
 			if( w_resolution ):
 				row = box.row()
 				row.label(" Render resolution is not 100%", icon="CANCEL")
-			
+
+			# Only Warning #
 			if( w_layer ):
 				row = box.row()
-				row.label(" All render layers are not visible", icon="CANCEL")
+				row.label(" All render layers are not visible", icon="ERROR")
 				
 			if( w_device ):
 				row = box.row()
 				row.label(" Render device is GPU", icon="ERROR")
-					
+			
+			# Fix button #	
+			if( w_simplify or w_resolution ):
+				row = box.row()	
+				row.operator("screen.fix_render_settings")	
+				
 		# ok dialog #
 		else:
 			row = box.row()
 			row.label("Everything is OK", icon="INFO")
 				
 				
-				
+class FixRenderSettings(bpy.types.Operator):
+
+	bl_idname = "screen.fix_render_settings"
+	bl_label = "Fix it"
+
+	def execute(self, context):
+		
+		context.scene.render.resolution_percentage = 100
+		context.scene.render.use_simplify = False
+
+		return {'FINISHED'}
+	
+					
 ################################################################
 # register #
 ############
