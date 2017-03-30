@@ -39,15 +39,15 @@ class RenderRegion(bpy.types.Operator):
 		
 		if( bpy.context.space_data.viewport_shade == 'RENDERED' ):
 			bpy.context.space_data.viewport_shade = 'MATERIAL'
+			bpy.ops.view3d.clear_render_border()
+
 		else:
+			bpy.ops.view3d.render_border('INVOKE_DEFAULT')
 			bpy.context.space_data.viewport_shade = 'RENDERED'
 			
 		'''	
 		global shadeSetting
-		
-		
-		
-		
+
 		if(bpy.context.space_data.use_render_border) :
 			
 			bpy.ops.view3d.clear_render_border()
