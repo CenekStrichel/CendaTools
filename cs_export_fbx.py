@@ -41,11 +41,25 @@ class StringsGroup(bpy.types.PropertyGroup):
 	soft_min = 0.0,
 	description = "How simplify baked animation\n0 is disabled")
 	
+
+	AnimationTypeEnum = [
+		("NLA", "NLA Strips", "", "", 0),
+	    ("Baked", "Baked", "", "", 100),
+		("Disabled", "Disabled", "", "", 200)
+	    ]
+	
+	bpy.types.Scene.NLAExport = EnumProperty( 
+	name = "Animation", 
+	description = "", 
+	items = AnimationTypeEnum )
+
+	'''
 	bpy.types.Scene.NLAExport = BoolProperty( 
 	name = "Export NLA Strips", 
 	default = True, 
 	description = "Only clip from NLA will be exported")
-	
+	'''
+
 	bpy.types.Scene.ExportPath = StringProperty(
 	name = "Export",
 	default = "",
@@ -238,6 +252,21 @@ class ExportToPlace(bpy.types.Operator):
 		# convert relative path to absolute
 		exportPath = bpy.path.abspath( exportPath ) 
 		
+		
+		# animation baked
+		if( context.scene.NLAExport == "Baked" ):
+			bakedAnimation = True
+			nlaStrips = False
+			
+		elif( context.scene.NLAExport == "NLA" ):
+			bakedAnimation = True
+			nlaStrips = True
+			
+		elif( context.scene.NLAExport == "Disabled" ):
+			bakedAnimation = False
+			nlaStrips = False
+		
+		# Export #		
 		if(len(exportPath) > 0):
 			
 			# FBX # export
@@ -267,9 +296,9 @@ class ExportToPlace(bpy.types.Operator):
 				use_armature_deform_only = True,
 				armature_nodetype = 'NULL',
 
-				bake_anim = True,
+				bake_anim = bakedAnimation, # changing this
 				bake_anim_use_all_bones = True,
-				bake_anim_use_nla_strips = context.scene.NLAExport,
+				bake_anim_use_nla_strips = nlaStrips, # changing this
 				bake_anim_use_all_actions = False,
 				bake_anim_force_startend_keying = True,
 				bake_anim_step = 1.0,
@@ -292,7 +321,7 @@ class ExportToPlace(bpy.types.Operator):
 				try:
 					bpy.ops.export_scene.selected(
 					filepath= exportPath, 
-					exporter='BLEND', 
+					exporter='BLEND',
 					exporter_index=0, 
 					use_convert_mesh=False, 
 					exporter_str="BLEND", 
