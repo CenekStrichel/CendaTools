@@ -53,13 +53,6 @@ class StringsGroup(bpy.types.PropertyGroup):
 	description = "", 
 	items = AnimationTypeEnum )
 
-	'''
-	bpy.types.Scene.NLAExport = BoolProperty( 
-	name = "Export NLA Strips", 
-	default = True, 
-	description = "Only clip from NLA will be exported")
-	'''
-
 	bpy.types.Scene.ExportPath = StringProperty(
 	name = "Export",
 	default = "",
@@ -88,11 +81,17 @@ class StringsGroup(bpy.types.PropertyGroup):
 	default = False, 
 	description = "Export override for object")
 	
+	
 	bpy.types.Object.ExportPathOverride = StringProperty(
 	name = "Export Path Override",
 	default = "",
 	subtype = "FILE_PATH",
 	description = "Export path\nE:\\model_object.fbx")
+	
+	bpy.types.Object.NLAExportOverride = EnumProperty( 
+	name = "Animation", 
+	description = "", 
+	items = AnimationTypeEnum )
 	
 	#
 	FormatTypeEnum = [
@@ -123,7 +122,15 @@ class ExportToPlacePanel(bpy.types.Panel):
 		layout = self.layout
 		row = layout.row(align=True)
 
-
+		# only first override is used
+		override = False
+		
+		for obj in bpy.context.selected_objects:
+			if( obj.ExportOverride ):
+				override = True
+				break
+		
+		#	
 		box = layout.box()
 		box.label("Format")
 		box.prop( scn, "ExportFormat" )
@@ -132,7 +139,11 @@ class ExportToPlacePanel(bpy.types.Panel):
 		box = layout.box()
 		box.label("Settings")
 		box.prop( scn, "Simplify" )
-		box.prop( scn, "NLAExport" )
+		
+		if( override ):
+			box.label( "Animation Override: " + obj.NLAExportOverride )
+		else:
+			box.prop( scn, "NLAExport" )
 		
 		if(scn.ExportFormat == 'Blend'):
 			box.enabled = False
@@ -144,17 +155,12 @@ class ExportToPlacePanel(bpy.types.Panel):
 		# Export
 		box = layout.box()
 		
-		# only first override is used
-		override = False
 		
-		for obj in bpy.context.selected_objects:
-			if( obj.ExportOverride ):
-				override = True
-				box.label("Export Override")
-				box.label( obj.ExportPathOverride )
-				break
-				
-		if(not override):
+		if( override ):		
+			box.label("Export Override")
+			box.label( obj.ExportPathOverride )
+	
+		else:
 			box.label("Export Paths")
 			box.prop( scn, "ExportPath", text = "" )
 
@@ -193,6 +199,7 @@ class ExportToPlaceObjectPanel(bpy.types.Panel):
 		
 		if(bpy.context.object.ExportOverride):
 			box.prop( context.object, "ExportPathOverride" )
+			box.prop( context.object, "NLAExportOverride" )
 
 		
 # export button	
@@ -217,6 +224,7 @@ class ExportToPlace(bpy.types.Operator):
 			extension = ".blend"	
 			
 		overrideActive = False
+		animExportSettings = context.scene.NLAExport
 		
 		# Override export object
 		for obj in bpy.context.selected_objects:
@@ -225,6 +233,8 @@ class ExportToPlace(bpy.types.Operator):
 					obj.ExportPathOverride += extension # save to settings
 
 				exportPath = obj.ExportPathOverride # BUG, blend is not added
+				animExportSettings = obj.NLAExportOverride
+				
 				overrideActive = True
 				break
 			
@@ -254,15 +264,15 @@ class ExportToPlace(bpy.types.Operator):
 		
 		
 		# animation baked
-		if( context.scene.NLAExport == "Baked" ):
+		if( animExportSettings == "Baked" ):
 			bakedAnimation = True
 			nlaStrips = False
 			
-		elif( context.scene.NLAExport == "NLA" ):
+		elif( animExportSettings == "NLA" ):
 			bakedAnimation = True
 			nlaStrips = True
 			
-		elif( context.scene.NLAExport == "Disabled" ):
+		elif( animExportSettings == "Disabled" ):
 			bakedAnimation = False
 			nlaStrips = False
 		
