@@ -92,26 +92,36 @@ class CutStrip(bpy.types.Operator):
 
 	
 	def execute(self, context):
-
-		try:
-		    selected_strips = [strip for strip in bpy.context.object.animation_data.nla_tracks.active.strips if strip.select]
 		
-		except AttributeError:
-		    selected_strips = []
-
+		# only for activated preview range
 		if bpy.context.scene.use_preview_range :
 			
+			try:
+			    selected_strips = [strip for strip in bpy.context.object.animation_data.nla_tracks.active.strips if strip.select]
+			
+			except AttributeError:
+			    selected_strips = []
+
+			# get range
 			startFrame = bpy.context.scene.frame_preview_start
 			endFrame = bpy.context.scene.frame_preview_end
 
 			for strip in selected_strips :
+				# set range animation
 				strip.action_frame_start = startFrame
 				strip.action_frame_end = endFrame
 				
-		# redraw 
-		for area in bpy.context.screen.areas:
-			if area.type == 'NLA_EDITOR':
-				area.tag_redraw()
+				# move animation clip
+				strip.frame_start = startFrame
+				strip.frame_end = endFrame
+		
+			# redraw 
+			for area in bpy.context.screen.areas:
+				if area.type == 'NLA_EDITOR':
+					area.tag_redraw()
+			
+		else:
+			self.report({'ERROR'}, "Preview Range in timeline must be activated!")	
 			
 		return {'FINISHED'}	
 	
