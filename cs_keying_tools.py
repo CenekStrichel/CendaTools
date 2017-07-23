@@ -86,6 +86,19 @@ class OnlyInsertNeeded(bpy.types.Operator):
 		return{'FINISHED'}
 	
 	
+class QuaternionToXYZ(bpy.types.Operator):
+
+	bl_label = "Quaternion to XYZ"
+	bl_idname = "scene.quaternion_to_xyz"
+
+	def execute(self, context):
+		for bone in bpy.context.selected_pose_bones:
+			if(bone.rotation_mode == "QUATERNION"):
+				bone.rotation_mode = "XYZ"
+
+		return{'FINISHED'}
+		
+		
 class KeyWholeCharacter(bpy.types.Operator):
 	
 	'''Key Whole Character'''
