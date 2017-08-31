@@ -259,7 +259,27 @@ class AnimationPlayRestore(bpy.types.Operator):
 							space.fx_settings.use_ssao = False
 
 		return {'FINISHED'}
-		
+	
+	
+class HideObjects(bpy.types.Operator):
+	
+	bl_idname = "object.hide_view_and_render"
+	bl_label = "Hide View and Render"
+	
+#	extend = BoolProperty(name="Extend", default=False)
+
+#	@classmethod
+#	def poll(cls, context):
+#		return context.area.type == 'GRAPH_EDITOR'
+
+	def execute(self, context):
+
+		context.object.hide_view_set
+		context.object.hide_render_set
+
+				
+		return {'FINISHED'}
+			
 	
 ############		
 # CHANNELS #
