@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "Render Debug",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "Render settings panel",
 	"description": "Warnings dialog before render",
 	"category": "Cenda Tools"}
@@ -49,8 +49,9 @@ class RenderDebugPanel(bpy.types.Panel):
 		
 		# warning tests #
 		w_simplify = context.scene.render.use_simplify
-		w_resolution = True if bpy.context.scene.render.resolution_percentage != 100 else False
+		w_resolution = True if bpy.context.scene.render.resolution_percentage < 100 else False
 		w_device = True if context.scene.cycles.device == 'GPU' else False
+		w_transparent = True if context.scene.cycles.film_transparent == False else False
 
 		w_layer = False
 		for i in range(0,20):    
@@ -62,7 +63,7 @@ class RenderDebugPanel(bpy.types.Panel):
 		box = layout.box()
 		    
 		# warning #
-		if( w_simplify or w_resolution or w_device or w_layer ):
+		if( w_simplify or w_resolution or w_device or w_layer or w_transparent ):
 
 			# Problem! #
 			if( w_simplify ):
@@ -71,7 +72,7 @@ class RenderDebugPanel(bpy.types.Panel):
 		      
 			if( w_resolution ):
 				row = box.row()
-				row.label(" Render resolution is not 100%", icon="CANCEL")
+				row.label(" Render resolution is below 100%", icon="CANCEL")
 
 			# Only Warning #
 			if( w_layer ):
@@ -81,7 +82,11 @@ class RenderDebugPanel(bpy.types.Panel):
 			if( w_device ):
 				row = box.row()
 				row.label(" Render device is GPU", icon="ERROR")
-			
+				
+			if( w_transparent ):
+				row = box.row()
+				row.label(" Transparent is Disabled", icon="ERROR")
+				
 			# Fix button #	
 			if( w_simplify or w_resolution ):
 				row = box.row()	
@@ -100,7 +105,9 @@ class FixRenderSettings(bpy.types.Operator):
 
 	def execute(self, context):
 		
-		context.scene.render.resolution_percentage = 100
+		if( context.scene.render.resolution_percentage < 100 ):
+			context.scene.render.resolution_percentage = 100
+			
 		context.scene.render.use_simplify = False
 
 		return {'FINISHED'}
