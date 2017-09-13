@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 5),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 6),
+	"blender": (2, 79, 0),
 	"location": "Export settings in Scene Properties, Export button in Header View3D",
 	"description": "Export selected objects to destination (FBX) with override per object",
 	"category": "Cenda Tools"}
@@ -293,8 +293,11 @@ class ExportToPlace(bpy.types.Operator):
 				global_scale = 1.0,
 				apply_unit_scale = False,
 				bake_space_transform = False,
+				apply_scale_options = 'FBX_SCALE_ALL',
+				
 				object_types = {'MESH', 'OTHER', 'EMPTY', 'CAMERA', 'LAMP', 'ARMATURE'},
 				use_mesh_modifiers = True,
+				use_mesh_modifiers_render = False,
 				mesh_smooth_type = 'OFF',
 
 				use_mesh_edges = False,
