@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 2),
+	"blender": (2, 79, 0),
 	"location": "Many commands",
 	"description": "Many tools",
 	"category": "Cenda Tools"}
@@ -656,7 +656,7 @@ class VIEW3D_HT_header_cenda(Header):
 		
 		#################################################
 		# quad view
-		row.operator("screen.region_quadview", text = "Quad View", icon = "VIEW3D_VEC")
+		row.operator("screen.region_quadview", text = "Quad View", icon = "GRID")
 		
 		# simplify			
 		state = bpy.context.scene.render.use_simplify
