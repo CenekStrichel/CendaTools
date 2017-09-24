@@ -274,8 +274,8 @@ class HideObjects(bpy.types.Operator):
 
 	def execute(self, context):
 
-		context.object.hide_view_set
-		context.object.hide_render_set
+		bpy.ops.object.hide_view_set()
+		bpy.ops.object.hide_render_set()
 
 				
 		return {'FINISHED'}
