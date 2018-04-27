@@ -269,7 +269,7 @@ class ObjectMode(bpy.types.Operator):
 		SetBoneSettings( "OCTAHEDRAL", False, False, False, True )	
 		
 		bpy.ops.object.mode_set(mode='OBJECT')
-		bpy.context.space_data.viewport_shade = 'MATERIAL'
+	#	bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
 		if(self.selectHierarchy):	
 			bpy.ops.object.select_grouped(extend=True, type='CHILDREN_RECURSIVE')
@@ -295,7 +295,7 @@ class EditMode(bpy.types.Operator):
 		SetBoneSettings( "OCTAHEDRAL", True, True, False, False )
 		
 		bpy.ops.object.mode_set(mode='EDIT')
-		bpy.context.space_data.viewport_shade = 'MATERIAL'
+	#	bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
 		obj = context.object
 		
@@ -352,7 +352,7 @@ class PoseMode(bpy.types.Operator):
 		SetBoneSettings( "OCTAHEDRAL", False, False, False, True )		
 		
 		bpy.ops.object.mode_set(mode='POSE')
-		bpy.context.space_data.viewport_shade = 'MATERIAL'
+	#	bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
 		# solid or wire by setting
 		if(obj.SolidDraw):
