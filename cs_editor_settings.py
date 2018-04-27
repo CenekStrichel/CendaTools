@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "Set Editor Settings",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 8, 0),
 	"location": "screen.set_editor_settings hotkey",
 	"description": "Set settings for all active editors",
 	"category": "Cenda Tools"}
@@ -51,7 +51,13 @@ class SetEditorSettings(bpy.types.Operator):
 		bpy.context.scene.tool_settings.use_mesh_automerge = True
 		
 		# paint weight
-		bpy.context.scene.tool_settings.weight_paint.use_normal = True
+		if ((2, 79, 4) <= bpy.app.version) :
+			for b in bpy.data.brushes :
+				b.use_frontface = True
+		else:
+			bpy.context.scene.tool_settings.weight_paint.use_normal = True
+				
+				
 		bpy.context.scene.tool_settings.use_auto_normalize = True
 
 		# areas #
