@@ -21,16 +21,20 @@
 bl_info = {
 	"name": "Layout Switcher",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "Info header",
 	"description": "Switch layout with buttons on Info header",
 	"category": "Cenda Tools"}
 
+
 import bpy
 from bpy.props import StringProperty
 from bpy.types import Header, Panel
+
 import platform
+import ctypes
+
 
 ################
 # AUTO IK CHAIN #
@@ -48,8 +52,6 @@ class SwitchLatout(bpy.types.Operator):
 	def execute(self, context):
 
 		bpy.context.window.screen = bpy.data.screens[ self.layoutName ]
-
-		
 		return {'FINISHED'}
 
 
@@ -62,18 +64,24 @@ def switchLayout(self, context):
 	
 	for area in bpy.context.screen.areas: # iterate through areas in current screen
 		totalWidth = totalWidth + area.width
-	
-	# my home station (1 monitor)
-	if( totalWidth <= 8000 ):
+		
+	# get resolution
+	user32 = ctypes.windll.user32
+	screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+
+	# my home station (1 big monitor)
+	if( screensize[0] >= 2560 ):
 		row = layout.row(align=True)
-		row.operator(SwitchLatout.bl_idname, text = "Generic").layoutName = "_1 Generic"
-		row.operator(SwitchLatout.bl_idname, text = "Animation").layoutName = "_2 Animation"
-	
+		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "_1 Generic"
+		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "_2 Animation"
+		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "_3 Composition"
+		
 	# another station (3 monitors)
 	else:
-		row.operator(SwitchLatout.bl_idname, text = "Generic").layoutName = "1 Generic"
-		row.operator(SwitchLatout.bl_idname, text = "Animation").layoutName = "2 Animation"
-		row.operator(SwitchLatout.bl_idname, text = "Composition").layoutName = "3 Composition"
+		row = layout.row(align=True)
+		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "1 Generic"
+		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "2 Animation"
+		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "3 Composition"
 
 
 
