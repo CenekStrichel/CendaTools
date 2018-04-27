@@ -21,8 +21,8 @@
 bl_info = {
 	"name": "Smart Mode Switcher",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "object.smart_mode command",
 	"description": "Smart switch between Object / Edit mode with change Properties",
 	"category": "Cenda Tools"}
@@ -32,11 +32,11 @@ import bpy
 from bpy.props import StringProperty #, IntProperty, BoolProperty, EnumProperty
 #from bpy.types import Header, Panel
 
-		
+'''		
 class SmartModeVariables(bpy.types.PropertyGroup):
 	
 	bpy.types.Scene.PreviousPanel = bpy.props.StringProperty( name = "Previous Panel", default = "" )
-
+'''
 
 # change object mode by selection			
 class SmartObjectMode(bpy.types.Operator):
@@ -88,33 +88,31 @@ class SmartObjectMode(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
-def SetPropertiesPanel( panelName, onlyObjectMode = False ):
+def SetPropertiesPanel( panelName , onlyObjectMode = False ):
 	
-	# new is object mode
-	if(bpy.context.active_object.mode == "OBJECT" and not onlyObjectMode):
 
-		for area in bpy.context.screen.areas: # iterate through areas in current screen
-			if area.type == 'PROPERTIES':
-				for space in area.spaces: # iterate through all founded panels
-					if space.type == 'PROPERTIES':
-						
-						if( len(bpy.context.scene.PreviousPanel) > 0 ):
+	for area in bpy.context.screen.areas: # iterate through areas in current screen
+		if area.type == 'PROPERTIES':
+			for space in area.spaces: # iterate through all founded panels
+				if space.type == 'PROPERTIES':
+
+					space.context = panelName
+					'''
+					pass
+				
+					# new is object mode
+					if(bpy.context.active_object.mode == "OBJECT" and not onlyObjectMode):
+						if( len(bpy.context.scene.PreviousPanel) > 0 ):	
 							space.context = bpy.context.scene.PreviousPanel
-		
-	
-	# new is some edit mode
-	else:
-		
-		for area in bpy.context.screen.areas: # iterate through areas in current screen
-			if area.type == 'PROPERTIES':
-				for space in area.spaces: # iterate through all founded panels
-					if space.type == 'PROPERTIES':
 						
+					# new is some edit mode
+					else:
 						if(not onlyObjectMode):
 							if(space.context != panelName):
 								bpy.context.scene.PreviousPanel = space.context
 								
 						space.context = panelName
+					'''
 			
 			
 	
