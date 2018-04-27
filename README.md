@@ -1,5 +1,7 @@
 # Cenda Tools
 Addons for Blender (Mainly for animators)
+
+Donate me!
 https://www.paypal.me/cenek
 
 Manual:
