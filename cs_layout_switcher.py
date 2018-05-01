@@ -33,7 +33,7 @@ from bpy.props import StringProperty
 from bpy.types import Header, Panel
 
 import platform
-import ctypes
+#import ctypes
 
 
 ################
@@ -65,25 +65,22 @@ def switchLayout(self, context):
 	for area in bpy.context.screen.areas: # iterate through areas in current screen
 		totalWidth = totalWidth + area.width
 		
-	# get resolution
-	user32 = ctypes.windll.user32
-	screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-
+	prefix = ""
+	
 	# my home station (1 big monitor)
-	if( screensize[0] >= 2560 ):
-		row = layout.row(align=True)
-		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "_1 Generic"
-		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "_2 Animation"
-		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "_3 Composition"
+	if "[M1]" in str(bpy.context.window.screen.name):
+		prefix = "[M1]"
 		
-	# another station (3 monitors)
-	else:
-		row = layout.row(align=True)
-		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "1 Generic"
-		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "2 Animation"
-		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "3 Composition"
-
-
+	elif "[M2]" in str(bpy.context.window.screen.name):
+		prefix = "[M2]"
+		
+	elif "[M3]" in str(bpy.context.window.screen.name):
+		prefix = "[M3]"
+		
+	row = layout.row(align=True)
+	row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = prefix + " 1 Generic"
+	row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = prefix + " 2 Animation"
+	row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = prefix + " 3 Composition"
 
 
 ################################################################
