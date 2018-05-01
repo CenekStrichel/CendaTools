@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 6),
+	"version": (1, 0, 7),
 	"blender": (2, 79, 0),
 	"location": "Export settings in Scene Properties, Export button in Header View3D",
 	"description": "Export selected objects to destination (FBX) with override per object",
@@ -41,7 +41,7 @@ class StringsGroup(bpy.types.PropertyGroup):
 	soft_min = 0.0,
 	description = "How simplify baked animation\n0 is disabled")
 	
-
+	
 	AnimationTypeEnum = [
 		("NLA", "NLA Strips", "", "", 0),
 	    ("Baked", "Baked", "", "", 100),
@@ -94,6 +94,7 @@ class StringsGroup(bpy.types.PropertyGroup):
 	items = AnimationTypeEnum )
 	
 	#
+	'''
 	FormatTypeEnum = [
 		("FBX", "FBX", "", "", 0),
 	    ("Blend", "Blend", "", "", 100)
@@ -103,7 +104,7 @@ class StringsGroup(bpy.types.PropertyGroup):
 	name = "Export Format", 
 	description = "", 
 	items = FormatTypeEnum )
-	
+	'''
 	
 	
 class ExportToPlacePanel(bpy.types.Panel):
@@ -131,9 +132,11 @@ class ExportToPlacePanel(bpy.types.Panel):
 				break
 		
 		#	
+		'''
 		box = layout.box()
 		box.label("Format")
 		box.prop( scn, "ExportFormat" )
+		'''
 		
 		# Settings
 		box = layout.box()
@@ -144,9 +147,10 @@ class ExportToPlacePanel(bpy.types.Panel):
 			box.label( "Animation Override: " + obj.NLAExportOverride )
 		else:
 			box.prop( scn, "NLAExport" )
-		
+		'''
 		if(scn.ExportFormat == 'Blend'):
 			box.enabled = False
+		'''
 			
 		box = layout.box()	
 		box.label("Blacklist")
@@ -217,12 +221,12 @@ class ExportToPlace(bpy.types.Operator):
 		exportPath = scn.ExportPath
 		
 		# right extension
-		if(scn.ExportFormat == 'FBX'):
-			extension = ".fbx"
-			
+	#	if(scn.ExportFormat == 'FBX'):
+		extension = ".fbx"
+		'''	
 		else:
 			extension = ".blend"	
-			
+		'''	
 		overrideActive = False
 		animExportSettings = context.scene.NLAExport
 		
