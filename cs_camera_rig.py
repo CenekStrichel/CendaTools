@@ -21,9 +21,9 @@
 bl_info = {
 	"name": "Camera Rig",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
-	"location": "New Camera menu",
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
+	"location": "Add > Armature > Camera Rig",
 	"description": "Create Custom camera rig",
 	"category": "Cenda Tools"}
 
