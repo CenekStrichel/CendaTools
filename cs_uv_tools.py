@@ -21,11 +21,14 @@
 bl_info = {
 	"name": "UV Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "Many commands",
 	"description": "Smart switch mode and components for UV Editor",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 
 import bpy

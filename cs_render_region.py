@@ -22,7 +22,11 @@ bl_info = {
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
 	"description": "Rendering in viewport",
-	"location": "Hotkey"
+	"location": "Hotkey",
+	"version": (1, 0, 0),
+	"blender": (2, 79, 0),
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
 }
 
 

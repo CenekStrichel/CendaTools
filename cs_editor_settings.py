@@ -25,7 +25,10 @@ bl_info = {
 	"blender": (2, 8, 0),
 	"location": "screen.set_editor_settings hotkey",
 	"description": "Set settings for all active editors",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 
 import bpy

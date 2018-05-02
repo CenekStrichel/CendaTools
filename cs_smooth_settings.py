@@ -21,11 +21,14 @@
 bl_info = {
 	"name": "Smooth Settings",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "Only hotkey",
 	"description": "Smoothing with Angle toggle",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 
 import bpy

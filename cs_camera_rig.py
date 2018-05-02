@@ -25,7 +25,10 @@ bl_info = {
 	"blender": (2, 79, 0),
 	"location": "Add > Armature > Camera Rig",
 	"description": "Create Custom camera rig",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 
 import bpy

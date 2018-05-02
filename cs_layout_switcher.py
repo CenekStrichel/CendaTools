@@ -25,7 +25,10 @@ bl_info = {
 	"blender": (2, 79, 0),
 	"location": "Info header",
 	"description": "Switch layout with buttons on Info header",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 
 import bpy

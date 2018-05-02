@@ -22,10 +22,13 @@ bl_info = {
 	"name": "Offset Animation",
 	"author": "Cenek Strichel",
 	"version": (1, 0, 2),
-	"blender": (2, 78, 0),
+	"blender": (2, 79, 0),
 	"location": "Tools > Offset Animation",
 	"description": "Offset for animated object and bones",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 	
 
 import bpy

@@ -21,11 +21,14 @@
 bl_info = {
 	"name": "Linked Physics",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 77, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "Physics > Linked Physic",
 	"description": "Change settings for linked physic",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 import bpy
 from bpy.props import StringProperty, IntProperty, BoolProperty

@@ -23,7 +23,11 @@ bl_info = {
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
 	"description": "Switching between Riggigng modes",
-	"location": "Add to Input: wm.call_menu + VIEW3D_MT_rig_switcher_menu & Armature Setting: Rig Switcher Settings"
+	"location": "Add to Input: wm.call_menu + VIEW3D_MT_rig_switcher_menu & Armature Setting: Rig Switcher Settings",
+	"version": (1, 0, 0),
+	"blender": (2, 79, 0),
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
 }
 
 import bpy

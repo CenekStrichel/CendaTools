@@ -22,10 +22,13 @@ bl_info = {
 	"name": "NLA Tools",
 	"author": "Cenek Strichel",
 	"version": (1, 0, 0),
-	"blender": (2, 78, 0),
+	"blender": (2, 79, 0),
 	"location": "NLA editor (headbar and hotkeys)",
 	"description": "NLA tools",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 import bpy
 from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty

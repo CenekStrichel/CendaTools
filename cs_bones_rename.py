@@ -21,11 +21,14 @@
 bl_info = {
 	"name": "Rename Bones",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
-	"blender": (2, 77, 0),
+	"version": (1, 0, 1),
+	"blender": (2, 79, 0),
 	"location": "Tools > Bones Renamer (Armature Edit Mode)",
 	"description": "Rename duplicated bones",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 	
 
 import bpy

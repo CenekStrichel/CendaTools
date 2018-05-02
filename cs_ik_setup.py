@@ -22,10 +22,13 @@ bl_info = {
 	"name": "IK Setup",
 	"author": "Cenek Strichel",
 	"version": (1, 0, 1),
-	"blender": (2, 78, 0),
+	"blender": (2, 79, 0),
 	"location": "Pose > Inverse Kinematics > Add IK to Bone with Auto Chain",
 	"description": "Easier IK Setup",
-	"category": "Cenda Tools"}
+	"category": "Cenda Tools",
+	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
+	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
+	}
 
 import bpy
 from bpy.props import IntProperty, BoolProperty, FloatProperty
