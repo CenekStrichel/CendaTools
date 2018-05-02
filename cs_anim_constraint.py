@@ -24,90 +24,23 @@ bl_info = {
 	"version": (1, 0, 1),
 	"blender": (2, 79, 0),
 	"location": "View 3D Header",
-	"description": "For baking helpers (ANIM) constraint",
+	"description": "For baking helpers (BAKE) constraint",
 	"category": "Cenda Tools",
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
 	}
 
 import bpy
-#from bpy.props import StringProperty, IntProperty, BoolProperty
+
 from bpy.props import EnumProperty
-from bpy.types import Header #, Panel
-
-
-
-class VIEW3D_HT_header_anim_constraint(Header):
-	
-	bl_space_type = 'VIEW_3D'
-
-
-	def draw(self, context):
-		
-		bone = bpy.context.active_pose_bone
-		
-		animCountOn = 0
-		animCountOff = 0
-		hasConstraint = 0
-		
-		if(bone != None):
-			current_icon = ""
-			
-			# cycle all constraint
-			for const in bone.constraints :
-				
-				if "ANIM" in const.name :
-					
-					if( const.mute ) :
-						current_icon = 'CHECKBOX_DEHLT'
-						animCountOn += 1
-						
-					else :	
-						current_icon = 'CHECKBOX_HLT'
-						animCountOff += 1
-					
-					# mixed states	
-					if( animCountOn > 0 and animCountOff > 0):
-						current_icon = 'QUESTION'
-					
-				if( const.active ) :
-					hasConstraint = 1
-					
-		layout = self.layout
-		row = layout.row(align=True)
-		row = layout.row(align=True)
-		
-		# buttons
-		if( bone != None ):
-			
-			# anim constraint
-			if( current_icon != "" ):
-				row.operator("view3d.switch_anim_constraint", icon = current_icon).switchStyle = 'Toggle'
-				
-			# anim bake	
-			if( current_icon == 'CHECKBOX_HLT' ):	
-				row.operator("view3d.bake_anim_constraint")
-				
-			# Add anim constraint
-			if( current_icon == "" and hasConstraint ):
-				row.operator("view3d.add_anim_constraint")
-		'''
-		for area in bpy.context.screen.areas:
-			if area.type == 'VIEW_3D':
-			#	area.header_text_set("ahoj")
-				area.tag_redraw()
-		'''
-				
-				
-		
-
+from bpy.types import Header
 
 
 class AnimConstraintSwitch(bpy.types.Operator):
 
 	'''Switching for Animation Constraint'''
 	bl_idname = "view3d.switch_anim_constraint"
-	bl_label = "Anim Constraint"
+	bl_label = "Constraint"
 	
 	switchStyleEnum = [
 	("Toggle", "Toggle", "", "", 0),
@@ -122,18 +55,17 @@ class AnimConstraintSwitch(bpy.types.Operator):
 
 		bone = bpy.context.active_pose_bone
 		state = False
-		
-		
+
 		# first state
 		if(self.switchStyle == 'Toggle'):
 			for const in bone.constraints :
-				if "ANIM" in const.name :
+				if "BAKE" in const.name :
 					state = const.mute
-				
-				
+	
 		# cycle all constraint
 		for const in bone.constraints :
-			if "ANIM" in const.name :
+			if "BAKE" in const.name :
+				
 				# Toggle / On / Off
 				if(self.switchStyle == 'Toggle'):
 					const.mute = not state
@@ -143,8 +75,7 @@ class AnimConstraintSwitch(bpy.types.Operator):
 					
 				elif(self.switchStyle == 'Off'):
 					const.mute = True
-				
-				
+	
 		# redraw constraint state
 		for area in bpy.context.screen.areas:
 			if area.type == 'PROPERTIES':
@@ -158,7 +89,7 @@ class AnimConstraintBake(bpy.types.Operator):
 
 	'''Baking for Animation Constraint'''
 	bl_idname = "view3d.bake_anim_constraint"
-	bl_label = "Bake Constraint"
+	bl_label = "Bake"
 	
 	def execute(self, context):
 
@@ -184,20 +115,81 @@ class AnimConstraintBake(bpy.types.Operator):
 		
 		
 class AnimConstraintAdd(bpy.types.Operator):
-	'''Adding ANIM to Constraints'''
+	
+	'''Mark constraint for bake with BAKE prefix'''
 	bl_idname = "view3d.add_anim_constraint"
-	bl_label = "Add Anim Constraint"
+	bl_label = "Mark Constraint"
 	
 	def execute(self, context):
 	
 		bone = bpy.context.active_pose_bone
 		
 		for const in bone.constraints :
-			if "ANIM" not in const.name : 
-				const.name = "ANIM " + const.name
+			if "BAKE" not in const.name : 
+				const.name = "BAKE " + const.name
+				break # only first
 
 		return {'FINISHED'}
+	
+	
+# PANEL #
+class PanelBakeConstraint(bpy.types.Panel):
+	
+	bl_label = 'Bake Constraint'
+	bl_space_type = 'VIEW_3D'
+	bl_region_type = 'TOOLS'
+	bl_category = 'Relations'
+	
+	def draw(self, context):
 		
+		bone = bpy.context.active_pose_bone
+
+		layout = self.layout
+		col = layout.column(align=True)
+
+		# buttons
+		if( bone != None ):
+
+			markedConstraint = False
+			current_icon = ""
+			
+			# cycle all constraint
+			for const in bone.constraints :
+				
+				if "BAKE" in const.name :
+					
+					if( const.mute ) :
+						current_icon = 'VISIBLE_IPO_OFF'
+						
+					else:	
+						current_icon = 'VISIBLE_IPO_ON'
+						
+				if(const.active):
+					markedConstraint = True
+					
+					
+			###################################################
+			# CONSTRAINT
+			###################################################
+			
+			# ADD MARK #
+			if( current_icon == "" ): 
+				
+				if( markedConstraint ):
+					col.operator("view3d.add_anim_constraint", icon = "CONSTRAINT")
+				
+				if( not markedConstraint ):
+					col.label("No constraint found")
+					
+			# MARK IS THERE #
+			else:
+				col.operator("view3d.switch_anim_constraint", icon = current_icon).switchStyle = 'Toggle'	
+				col.operator("view3d.bake_anim_constraint", icon = "BLANK1" )
+				
+		else:
+			col.label("Select bone")
+
+
 ################################################################
 # register #
 
