@@ -48,6 +48,7 @@ class VIEW3D_HT_header_anim_constraint(Header):
 		
 		animCountOn = 0
 		animCountOff = 0
+		hasConstraint = 0
 		
 		if(bone != None):
 			current_icon = ""
@@ -69,6 +70,8 @@ class VIEW3D_HT_header_anim_constraint(Header):
 					if( animCountOn > 0 and animCountOff > 0):
 						current_icon = 'QUESTION'
 					
+				if( const.active ) :
+					hasConstraint = 1
 					
 		layout = self.layout
 		row = layout.row(align=True)
@@ -85,7 +88,9 @@ class VIEW3D_HT_header_anim_constraint(Header):
 			if( current_icon == 'CHECKBOX_HLT' ):	
 				row.operator("view3d.bake_anim_constraint")
 				
-
+			# Add anim constraint
+			if( current_icon == "" and hasConstraint ):
+				row.operator("view3d.add_anim_constraint")
 		'''
 		for area in bpy.context.screen.areas:
 			if area.type == 'VIEW_3D':
@@ -176,7 +181,23 @@ class AnimConstraintBake(bpy.types.Operator):
 			bpy.ops.view3d.switch_anim_constraint( switchStyle = 'Off')
 
 		return {'FINISHED'}
+		
+		
+class AnimConstraintAdd(bpy.types.Operator):
+	'''Adding ANIM to Constraints'''
+	bl_idname = "view3d.add_anim_constraint"
+	bl_label = "Add Anim Constraint"
 	
+	def execute(self, context):
+	
+		bone = bpy.context.active_pose_bone
+		
+		for const in bone.constraints :
+			if "ANIM" not in const.name : 
+				const.name = "ANIM " + const.name
+
+		return {'FINISHED'}
+		
 ################################################################
 # register #
 
