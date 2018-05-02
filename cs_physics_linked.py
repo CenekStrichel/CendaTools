@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Linked Physics",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "Physics > Linked Physic",
 	"description": "Change settings for linked physic",
@@ -31,6 +31,7 @@ bl_info = {
 	}
 
 import bpy
+
 from bpy.props import StringProperty, IntProperty, BoolProperty
 from bpy.types import Header, Panel
 
@@ -49,7 +50,7 @@ class VIEW3D_PT_tools_linkedPhysics(bpy.types.Panel):
 	bl_context = "objectmode"
 
 
-	bpy.types.Scene.LinkedObjectName = StringProperty( name = "Cloth Object", description = "", default = "" )
+#	bpy.types.Scene.LinkedObjectName = StringProperty( name = "Cloth Object", description = "", default = "" )
 	bpy.types.Scene.LinkedStartFrane = IntProperty( name = "Start Frame", description = "", default = 0 )
 	bpy.types.Scene.LinkedEndFrane = IntProperty( name = "End Frame", description = "", default = 100 )
 	
@@ -57,16 +58,23 @@ class VIEW3D_PT_tools_linkedPhysics(bpy.types.Panel):
 	def draw(self, context):
 		
 		scn = context.scene
-		layout = self.layout
-
-		col = layout.column(align=True)
-		col.prop(scn, "LinkedObjectName", text = "Cloth Object")
-
-		row = layout.row(align=True)
-		row.prop(scn, "LinkedStartFrane", text="Start")
-		row.prop(scn, "LinkedEndFrane", text="End")
 		
-		col = layout.column(align=True)
+		layout = self.layout
+		box = layout.column(align=True)
+		
+	#	box = layout.box()
+	#	box.label("Cloth")
+	
+		col = box.column(align=True)
+
+	#	col.prop(scn, "LinkedObjectName", text = "Object Name")
+	#	col.separator()
+
+		col.prop(scn, "LinkedStartFrane", text="Start")
+		col.prop(scn, "LinkedEndFrane", text="End")
+		
+		col.separator()
+		
 		col.operator("object.linked_physics_set", text="Set Range", icon = "PHYSICS")
 		
 		'''
@@ -81,25 +89,53 @@ class LinkedPhysicsSet(bpy.types.Operator):
 	bl_idname = "object.linked_physics_set"
 	bl_label = "Set linked physics options"
 
+
 	def execute(self, context):
 		
-		scn = bpy.context.scene
-		obj = bpy.context.object
+		modifier = False
 		
-		ob = bpy.data.objects[ scn.LinkedObjectName ]
-		cache = ob.modifiers["Cloth"].point_cache
+		try:
+			if( bpy.context.object.modifiers["Cloth"] ):
+				ChangeStartEnd("Cloth")
+				modifier = True
+		except:
+			pass
 		
-		cache.frame_start = scn.LinkedStartFrane
-		cache.frame_end = scn.LinkedEndFrane
+		try:
+			if( bpy.context.object.modifiers["Softbody"] ):
+				ChangeStartEnd("Softbody")
+				modifier = True
+		except:
+			pass
+		
+		'''
+		try:
+			if( bpy.context.object.modifiers["Smoke"] ):
+				ChangeStartEnd("Smoke")
+				modifier = True
+		except:
+			pass
+		'''
+		
+		if(not modifier):
+			self.report({'ERROR'}, "Supported physic modifier is not available!")
 		
 		
 		for area in bpy.context.screen.areas:
 			if area.type == 'PROPERTIES':
 				area.tag_redraw()
-		
-		
+
 		return {'FINISHED'}	
 
+
+def ChangeStartEnd( modifier ):
+	
+	scn = bpy.context.scene
+
+	cache = bpy.context.object.modifiers[ modifier ].point_cache
+	
+	cache.frame_start = scn.LinkedStartFrane
+	cache.frame_end = scn.LinkedEndFrane
 
 
 ################################################################
