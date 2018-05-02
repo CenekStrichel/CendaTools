@@ -578,10 +578,7 @@ class AnimKeyInsertMenuNeededViewport( bpy.types.Operator ):
 
 			# keying type
 			if(self.location):
-				
-			#	self.rotation = False
-			#	self.scale = False
-				
+
 				bpy.ops.anim.keyframe_insert_menu(type='Location')
 				
 				for i in range (0,3):
@@ -590,10 +587,7 @@ class AnimKeyInsertMenuNeededViewport( bpy.types.Operator ):
 
 							
 			elif(self.rotation):
-				
-			#	self.location = False
-			#	self.scale = False
-				
+
 				bpy.ops.anim.keyframe_insert_menu(type='Rotation')
 				
 				for ir in range (0,3):
@@ -601,9 +595,6 @@ class AnimKeyInsertMenuNeededViewport( bpy.types.Operator ):
 						bpy.context.object.keyframe_delete(data_path="rotation_euler", index=ir)
 						
 			elif(self.scale):
-				
-			#	self.location = False
-			#	self.rotation = False
 
 				bpy.ops.anim.keyframe_insert_menu(type='Scaling')
 				
