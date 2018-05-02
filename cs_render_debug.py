@@ -57,43 +57,46 @@ class RenderDebugPanel(bpy.types.Panel):
 		w_transparent = True if context.scene.cycles.film_transparent == False else False
 
 		w_layer = False
+		
 		for i in range(0,20):    
 			if(bpy.context.scene.layers[i] == False):
 				w_layer = True
 				break
-			
 
-		box = layout.box()
-		    
 		# warning #
 		if( w_simplify or w_resolution or w_device or w_layer or w_transparent ):
-
-			# Problem! #
-			if( w_simplify ):
-				row = box.row()
-				row.label(" Simplify is Enabled", icon="CANCEL")
-		      
-			if( w_resolution ):
-				row = box.row()
-				row.label(" Render resolution is below 100%", icon="CANCEL")
-
+	
+			# Fix button only for error#	
+			if( w_simplify or w_resolution ):
+				
+				box = layout.box()
+				row = box.row()	
+				
+				row.operator("screen.fix_render_settings")
+				
+				# Problem! #
+				if( w_simplify ):
+					row = box.row()
+					row.label(" Simplify is Enabled", icon="ERROR")
+			      
+				if( w_resolution ):
+					row = box.row()
+					row.label(" Render resolution is below 100%", icon="ERROR")
+				
 			# Only Warning #
+			box = layout.box()
+
 			if( w_layer ):
 				row = box.row()
-				row.label(" All render layers are not visible", icon="ERROR")
+				row.label(" All render layers are not visible", icon="QUESTION")
 				
 			if( w_device ):
 				row = box.row()
-				row.label(" Render device is GPU", icon="ERROR")
+				row.label(" Render device is GPU", icon="QUESTION")
 				
 			if( w_transparent ):
 				row = box.row()
-				row.label(" Transparent is Disabled", icon="ERROR")
-				
-			# Fix button #	
-			if( w_simplify or w_resolution ):
-				row = box.row()	
-				row.operator("screen.fix_render_settings")	
+				row.label(" Transparent is Disabled", icon="QUESTION")
 				
 		# ok dialog #
 		else:
@@ -104,7 +107,7 @@ class RenderDebugPanel(bpy.types.Panel):
 class FixRenderSettings(bpy.types.Operator):
 
 	bl_idname = "screen.fix_render_settings"
-	bl_label = "Fix it"
+	bl_label = "Fix Errors"
 
 	def execute(self, context):
 		
