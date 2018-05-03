@@ -53,8 +53,11 @@ class SwitchLatout(bpy.types.Operator):
 	
 	
 	def execute(self, context):
-
-		bpy.context.window.screen = bpy.data.screens[ self.layoutName ]
+		try:
+			bpy.context.window.screen = bpy.data.screens[ self.layoutName ]
+		except:
+			self.report({'ERROR'}, "Can not find layout: \"" + self.layoutName + "\"")
+			
 		return {'FINISHED'}
 
 
@@ -81,9 +84,18 @@ def switchLayout(self, context):
 		prefix = "[M3]"
 		
 	row = layout.row(align=True)
-	row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = prefix + " 1 Generic"
-	row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = prefix + " 2 Animation"
-	row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = prefix + " 3 Composition"
+	
+	if(prefix == ""):
+
+		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "1 Generic"
+		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "2 Animation"
+		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "3 Composition"
+		
+	else:
+		
+		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = (prefix + " 1 Generic")
+		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = (prefix + " 2 Animation")
+		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = (prefix + " 3 Composition")
 
 
 ################################################################
