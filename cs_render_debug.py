@@ -53,9 +53,10 @@ class RenderDebugPanel(bpy.types.Panel):
 		# warning tests #
 		w_simplify = context.scene.render.use_simplify
 		w_resolution = True if bpy.context.scene.render.resolution_percentage < 100 else False
+		
+		# just info
 		w_device = True if context.scene.cycles.device == 'GPU' else False
 		w_transparent = True if context.scene.cycles.film_transparent == False else False
-
 		w_layer = False
 		
 		for i in range(0,20):    
@@ -118,15 +119,49 @@ class FixRenderSettings(bpy.types.Operator):
 
 		return {'FINISHED'}
 	
-					
+	
+
+def VIEW3D_HT_RenderDebug(self, context):
+	
+	layout = self.layout
+	
+	# warning tests #
+	w_simplify = context.scene.render.use_simplify
+	w_resolution = True if bpy.context.scene.render.resolution_percentage < 100 else False
+	
+	if( w_simplify or w_resolution ):
+
+		row = layout.row(align=True)
+		row.separator()
+		row.operator("screen.show_render_debug", text = "", icon = "ERROR")
+		
+		
+class ShowDebug(bpy.types.Operator):
+
+	bl_idname = "screen.show_render_debug"
+	bl_label = "Show Render Debug"
+
+	def execute(self, context):
+	
+		for area in bpy.context.screen.areas: # iterate through areas in current screen
+			if area.type == 'PROPERTIES':
+				for space in area.spaces: # iterate through all founded panels
+					if space.type == 'PROPERTIES':	
+						space.context = 'RENDER'
+
+		return {'FINISHED'}	
+	
+			
 ################################################################
 # register #
 ############
 def register():
 	bpy.utils.register_module(__name__)
-
+	bpy.types.VIEW3D_HT_header.prepend(VIEW3D_HT_RenderDebug)
+	
 def unregister():
 	bpy.utils.unregister_module(__name__)
+	bpy.types.VIEW3D_HT_header(VIEW3D_HT_RenderDebug)
 	
 if __name__ == "__main__":
 	register()
