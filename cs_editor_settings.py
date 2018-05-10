@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Set Editor Settings",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 8, 0),
 	"location": "screen.set_editor_settings hotkey",
 	"description": "Set settings for all active editors",
@@ -79,6 +79,7 @@ class SetEditorSettings(bpy.types.Operator):
 				elif(space.type == 'VIEW_3D'):
 					space.use_occlude_geometry = True
 					space.show_relationship_lines = False
+					space.lock_camera_and_layers = False
 
 				elif(space.type == 'IMAGE_EDITOR'):
 					space.uv_editor.show_other_objects = True
