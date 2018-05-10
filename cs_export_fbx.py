@@ -135,6 +135,7 @@ class ExportToPlacePanel(bpy.types.Panel):
 				break
 		
 		#	
+		
 		'''
 		box = layout.box()
 		box.label("Format")
@@ -150,6 +151,7 @@ class ExportToPlacePanel(bpy.types.Panel):
 			box.label( "Animation Override: " + obj.NLAExportOverride )
 		else:
 			box.prop( scn, "NLAExport" )
+			
 		'''
 		if(scn.ExportFormat == 'Blend'):
 			box.enabled = False
