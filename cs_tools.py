@@ -808,7 +808,8 @@ class SetInOutRange(bpy.types.Operator):
 
 		return {'FINISHED'}	
 		
-	
+
+# SHOW MATERIAL SETTINGS #	
 class ShowMaterial(bpy.types.Operator):
 
 	'''Show Material'''
@@ -825,10 +826,26 @@ class ShowMaterial(bpy.types.Operator):
 		if(obj.type == "MESH"):
 			
 			for area in bpy.context.screen.areas: # iterate through areas in current screen
+				
+				# Set Properties
 				if area.type == 'PROPERTIES':
 					for space in area.spaces: # iterate through all founded panels
 						if space.type == 'PROPERTIES':	
 							space.context = 'MATERIAL'
+							
+				# Set Node editor
+				if area.type == 'NODE_EDITOR':
+					for space in area.spaces: # iterate through all founded panels
+						if space.type == 'NODE_EDITOR':	
+							space.tree_type = 'ShaderNodeTree'
+							space.shader_type = 'OBJECT'
+							'''
+							override = {}
+							override['area'  ] = area
+							override['region'] = space
+							
+							bpy.ops.node.view_all(override)
+							'''
 						
 		return {'FINISHED'}	
 	
