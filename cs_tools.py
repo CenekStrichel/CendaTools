@@ -924,7 +924,28 @@ class ProportionalSwitcher(bpy.types.Operator):
 	#	bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
 				
 		return {'FINISHED'}	
-'''							
+'''	
+
+class SwitchWeight(bpy.types.Operator):
+
+	'''Switch Weight value from 1 to 0'''
+	bl_idname = "scene.switch_weight"
+	bl_label = "Switch Weight"
+	bl_options = {'REGISTER', 'UNDO'}
+
+
+	def execute(self, context):
+		
+		# show all
+		if(bpy.context.scene.tool_settings.unified_paint_settings.weight == 0):
+			bpy.context.scene.tool_settings.unified_paint_settings.weight = 1
+		else:
+			bpy.context.scene.tool_settings.unified_paint_settings.weight = 0	
+
+				
+		return {'FINISHED'}
+	
+							
 ################################################################
 # register #
 
