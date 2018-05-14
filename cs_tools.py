@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"location": "Many commands",
 	"description": "Many tools",
@@ -945,7 +945,27 @@ class SwitchWeight(bpy.types.Operator):
 				
 		return {'FINISHED'}
 	
-							
+	
+class MarkSeamWithDislay(bpy.types.Operator):
+
+	'''Mark UV seam with display'''
+	bl_idname = "mesh.mark_seam_with_display"
+	bl_label = "Mark UV Seam"
+	bl_options = {'REGISTER', 'UNDO'}
+
+
+	def execute(self, context):
+		
+		# show all
+		bpy.ops.mesh.mark_seam(clear=False)
+		bpy.context.object.data.show_edge_crease = False
+		bpy.context.object.data.show_edge_seams = True
+		bpy.context.object.data.show_edge_sharp = False
+		bpy.context.object.data.show_edge_bevel_weight = False
+				
+		return {'FINISHED'}
+	
+						
 ################################################################
 # register #
 
