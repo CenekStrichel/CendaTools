@@ -941,8 +941,7 @@ class SwitchWeight(bpy.types.Operator):
 			bpy.context.scene.tool_settings.unified_paint_settings.weight = 1
 		else:
 			bpy.context.scene.tool_settings.unified_paint_settings.weight = 0	
-
-				
+	
 		return {'FINISHED'}
 	
 	
@@ -965,15 +964,43 @@ class MarkSeamWithDislay(bpy.types.Operator):
 				
 		return {'FINISHED'}
 	
-						
+# TIMELINE #	
+def TIMELINE_HT_AudioMute(self, context):
+	
+	layout = self.layout
+	
+	if(bpy.context.scene.use_audio):
+		icon = "MUTE_IPO_ON"
+	else:
+		icon = "MUTE_IPO_OFF"
+
+	row = layout.row(align=True)
+#	row.separator()
+	row.operator( "screen.audio_mute_toggle", text = "Audio", icon = icon )
+		
+		
+class AudioMuteToggle(bpy.types.Operator):
+
+	bl_idname = "screen.audio_mute_toggle"
+	bl_label = "Audio Mute Toggle"
+
+	def execute(self, context):
+	
+		bpy.context.scene.use_audio = not bpy.context.scene.use_audio
+
+		return {'FINISHED'}	
+		
+							
 ################################################################
 # register #
 
 def register():
 	bpy.utils.register_module(__name__)
+	bpy.types.TIME_HT_header.prepend(TIMELINE_HT_AudioMute)
 	
 def unregister():
 	bpy.utils.unregister_module(__name__)
+	bpy.types.TIME_HT_header(TIMELINE_HT_AudioMute)
 	
 if __name__ == "__main__":
 	register()
