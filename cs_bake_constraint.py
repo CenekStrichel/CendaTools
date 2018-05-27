@@ -19,11 +19,11 @@
 
 
 bl_info = {
-	"name": "Animation Constraint",
+	"name": "Bake Constraint",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
-	"location": "View 3D Header",
+	"location": "Relations > Bake Constraint",
 	"description": "For baking helpers (BAKE) constraint",
 	"category": "Cenda Tools",
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
