@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Linked Physics",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"location": "Physics > Linked Physic",
 	"description": "Change settings for linked physic",
