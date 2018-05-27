@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Render Debug",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "Render settings panel",
 	"description": "Warnings dialog before render",
@@ -108,7 +108,7 @@ class RenderDebugPanel(bpy.types.Panel):
 class FixRenderSettings(bpy.types.Operator):
 
 	bl_idname = "screen.fix_render_settings"
-	bl_label = "Fix Errors"
+	bl_label = "Fix"
 
 	def execute(self, context):
 		
