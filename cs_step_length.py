@@ -21,10 +21,10 @@
 bl_info = {
 	"name": "Get Step Length",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "View 3D > Tools",
-	"description": "Show motion path",
+	"description": "Compare step length for Quadruped",
 	"category": "Cenda Tools",
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
