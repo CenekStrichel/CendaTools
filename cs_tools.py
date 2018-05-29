@@ -476,7 +476,7 @@ class IsolateObject(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
-	
+# Join object UV to one UV even it has different names	
 class JoinObjectsWithUV(bpy.types.Operator):
 	
 	bl_idname = "object.join_with_uv"
@@ -488,12 +488,17 @@ class JoinObjectsWithUV(bpy.types.Operator):
 	def execute(self, context):
 		
 		if(self.uvmerge):
+			
+			newName = "UVMap"
+			
 			# rename UV for merge
-			newName = bpy.context.object.data.uv_textures[0].name
+			if(len(bpy.context.object.data.uv_textures) > 0):
+				newName = bpy.context.object.data.uv_textures[0].name
 			
 			# all objects UV rename
 			for obj in bpy.context.selected_objects:
-				obj.data.uv_textures[0].name = newName
+				if(len(obj.data.uv_textures) > 0):
+					obj.data.uv_textures[0].name = newName
 
 		# join
 		bpy.ops.object.join()	
@@ -555,8 +560,11 @@ def FrameForEditor( currentArea, testedArea ):
 					bpy.ops.graph.view_all(ctx)
 						
 				break
-	
-
+			
+			
+###################################	
+# VIEW 3D HEADER #
+###################################
 class VIEW3D_HT_header_cenda(Header):
 	
 	bl_space_type = 'VIEW_3D'
@@ -674,10 +682,11 @@ class BackfaceToggle(bpy.types.Operator):
 		return {'FINISHED'}
 		
 		
-		
+'''		
 class TextureToggle(bpy.types.Operator):
-
-	'''Texture Toggle'''
+'''
+'''Texture Toggle'''
+'''
 	bl_idname = "scene.texture_toggle"
 	bl_label = "Texture"
 #	bl_options = {'REGISTER', 'UNDO'}
@@ -689,7 +698,7 @@ class TextureToggle(bpy.types.Operator):
 		context.object.active_material.use_textures[1] = not context.object.active_material.use_textures[1]
 
 		return {'FINISHED'}
-	
+'''	
 			
 ###########################################################
 class SetInOutRange(bpy.types.Operator):
@@ -857,7 +866,7 @@ class SwitchWeight(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
-class MarkSeamWithDislay(bpy.types.Operator):
+class MarkSeamWithDisplay(bpy.types.Operator):
 
 	'''Mark UV seam with display'''
 	bl_idname = "mesh.mark_seam_with_display"
