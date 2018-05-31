@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Layout Switcher",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "Info header",
 	"description": "Switch layout with buttons on Info header",
@@ -36,7 +36,6 @@ from bpy.props import StringProperty
 from bpy.types import Header, Panel
 
 import platform
-#import ctypes
 
 
 ################
@@ -75,28 +74,30 @@ def switchLayout(self, context):
 	
 	# my home station (1 big monitor)
 	if "[M1]" in str(bpy.context.window.screen.name):
-		prefix = "[M1]"
+		prefix = "[M1] "
 		
 	elif "[M2]" in str(bpy.context.window.screen.name):
-		prefix = "[M2]"
+		prefix = "[M2] "
 		
 	elif "[M3]" in str(bpy.context.window.screen.name):
-		prefix = "[M3]"
+		prefix = "[M3] "
 		
 	row = layout.row(align=True)
 	
+	'''
 	if(prefix == ""):
 
 		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "1 Generic"
 		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "2 Animation"
 		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "3 Composition"
-		
+		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "4 Scripting"
 	else:
-		
-		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = (prefix + " 1 Generic")
-		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = (prefix + " 2 Animation")
-		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = (prefix + " 3 Composition")
-
+	'''	
+	
+	row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = (prefix + "1 Generic")
+	row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = (prefix + "2 Animation")
+	row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = (prefix + "3 Composition")
+	row.operator(SwitchLatout.bl_idname, text = "", icon = "TEXT").layoutName = (prefix + "4 Scripting")
 
 ################################################################
 # register 
