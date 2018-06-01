@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Render Debug",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"location": "Render settings panel",
 	"description": "Warnings dialog before render",
@@ -32,7 +32,6 @@ bl_info = {
 
 
 import bpy
-#from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
 from bpy.types import Header, Panel
 
 
@@ -123,17 +122,22 @@ class FixRenderSettings(bpy.types.Operator):
 
 def VIEW3D_HT_RenderDebug(self, context):
 	
-	layout = self.layout
-	
-	# warning tests #
-	w_simplify = context.scene.render.use_simplify
-	w_resolution = True if bpy.context.scene.render.resolution_percentage < 100 else False
-	
-	if( w_simplify or w_resolution ):
+	space = bpy.context.space_data
+		
+	# Normal view
+	if(space.region_3d.view_perspective != 'CAMERA'): # only for camera
+		
+		layout = self.layout
+		
+		# warning tests #
+		w_simplify = context.scene.render.use_simplify
+		w_resolution = True if bpy.context.scene.render.resolution_percentage < 100 else False
+		
+		if( w_simplify or w_resolution ):
 
-		row = layout.row(align=True)
-		row.separator()
-		row.operator("screen.show_render_debug", text = "", icon = "ERROR")
+			row = layout.row(align=True)
+			row.separator()
+			row.operator("screen.show_render_debug", text = "", icon = "ERROR")
 		
 		
 class ShowDebug(bpy.types.Operator):
