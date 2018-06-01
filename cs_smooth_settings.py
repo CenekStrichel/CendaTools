@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Smooth Settings",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "Only hotkey",
 	"description": "Smoothing with Angle toggle",
@@ -42,23 +42,25 @@ class SetSmooth(bpy.types.Operator):
 	bl_label = "Smooth"
 	bl_options = {'REGISTER', 'UNDO'}
 	
-	angle = FloatProperty( name = "Angle", default = 30, min = 0, max = 180 )
+	angle = FloatProperty( name = "Angle", default = 120, min = 0, max = 180 )
 	
 	def execute(self, context):
 		
 		# Smooth #
-		if( not bpy.context.object.data.use_auto_smooth ):
+	#	if( not bpy.context.object.data.use_auto_smooth ):
 			
-			bpy.ops.object.shade_smooth()
-			
-			objs = bpy.context.selected_objects
-			for o in objs:
-				o.data.use_auto_smooth = True
-				o.data.auto_smooth_angle = math.radians(self.angle)
-			
-			bpy.ops.mesh.customdata_custom_splitnormals_clear() # needed for imported FBX
+		bpy.ops.object.shade_smooth()
+		
+		objs = bpy.context.selected_objects
+		
+		for o in objs:
+			o.data.use_auto_smooth = True
+			o.data.auto_smooth_angle = math.radians(self.angle)
+		
+		bpy.ops.mesh.customdata_custom_splitnormals_clear() # needed for imported FBX
 			
 		# Flat #
+		'''
 		else:
 			
 			bpy.ops.object.shade_flat()
@@ -66,7 +68,7 @@ class SetSmooth(bpy.types.Operator):
 			objs = bpy.context.selected_objects
 			for o in objs:
 				o.data.use_auto_smooth = False
-
+		'''
 			
 		return {'FINISHED'}
 
