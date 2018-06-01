@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Viewport Toggles",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
+	"version": (1, 0, 1),
 	"blender": (2, 79, 0),
 	"location": "View 3D header",
 	"description": "Several commands in 3D View header",
@@ -43,72 +43,77 @@ class VIEW3D_HT_header_cenda(Header):
 
 	def draw(self, context):
 		
-		layout = self.layout
+		space = bpy.context.space_data
 		
-		row = layout.row(align=True)
-		row = layout.row(align=True)
+		# Normal view
+		if(space.region_3d.view_perspective != 'CAMERA'): # only for non camera
 		
-		#################################################
-		# quad view
-		row.operator("screen.region_quadview", text = "Quad View", icon = "GRID")
-		
-		# simplify			
-		state = bpy.context.scene.render.use_simplify
-		
-		if (state) :
-			current_icon = 'CHECKBOX_HLT'
-		else:
-			current_icon = 'CHECKBOX_DEHLT'
+			layout = self.layout
 			
-		row.operator("scene.simplify_toggle", icon = current_icon)
+			row = layout.row(align=True)
+			row = layout.row(align=True)
 			
-		#################################################	
-		# culling	
-		row = layout.row(align=True)	
-		state = bpy.context.space_data.show_backface_culling
+			#################################################
+			# quad view
+			row.operator("screen.region_quadview", text = "Quad View", icon = "GRID")
+			
+			# simplify			
+			state = bpy.context.scene.render.use_simplify
+			
+			if (state) :
+				current_icon = 'CHECKBOX_HLT'
+			else:
+				current_icon = 'CHECKBOX_DEHLT'
+				
+			row.operator("scene.simplify_toggle", icon = current_icon)
+				
+			#################################################	
+			# culling	
+			row = layout.row(align=True)	
+			state = bpy.context.space_data.show_backface_culling
 
-		if (state) :
-			current_icon = 'CHECKBOX_HLT'
-		else:
-			current_icon = 'CHECKBOX_DEHLT'
-		
-		row.operator("scene.backface_toggle", icon = current_icon)
+			if (state) :
+				current_icon = 'CHECKBOX_HLT'
+			else:
+				current_icon = 'CHECKBOX_DEHLT'
+			
+			row.operator("scene.backface_toggle", icon = current_icon)
 
-		# texture	
-		if( context.scene.render.engine == "BLENDER_RENDER" and context.object.type == "MESH"):
-			row.operator("scene.texture_toggle")
-		
-		'''
-		#################################################
-		# export
-		row = layout.row(align=True)
-		
-		if(bpy.context.active_object.mode  == 'OBJECT'):
-			row.enabled = True
-		else:
-			row.enabled = False
+			# texture	
+			if( context.scene.render.engine == "BLENDER_RENDER" and context.object.type == "MESH"):
+				row.operator("scene.texture_toggle")
 			
-		# only first override is used
-		textExport = context.scene.ExportPath.rsplit('\\', 1)[-1]
-	#	icon = "EXPORT"
-		
-		for obj in bpy.context.selected_objects:
-			if( obj.ExportOverride ):
-				textExport = "[ " + context.object.ExportPathOverride.rsplit('\\', 1)[-1] + " ]"	
-			#	icon = "PMARKER_ACT"
-				break
+			'''
+			#################################################
+			# export
+			row = layout.row(align=True)
 			
-		if(len(textExport) > 0):
-			row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
-		'''
-		'''
-		# fluid bake
-		obj = bpy.context.active_object
-		if "Fluidsim" in obj.modifiers :
-		#	if fluid.type == 'DOMAIN':
-		#	row.operator("fluid.bake", text="Bake",translate=False, icon='MOD_FLUIDSIM')
-			row.operator("object.bake_fluid", text="Bake",translate=False, icon='MOD_FLUIDSIM')
-		'''
+			if(bpy.context.active_object.mode  == 'OBJECT'):
+				row.enabled = True
+			else:
+				row.enabled = False
+				
+			# only first override is used
+			textExport = context.scene.ExportPath.rsplit('\\', 1)[-1]
+		#	icon = "EXPORT"
+			
+			for obj in bpy.context.selected_objects:
+				if( obj.ExportOverride ):
+					textExport = "[ " + context.object.ExportPathOverride.rsplit('\\', 1)[-1] + " ]"	
+				#	icon = "PMARKER_ACT"
+					break
+				
+			if(len(textExport) > 0):
+				row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
+			'''
+			'''
+			# fluid bake
+			obj = bpy.context.active_object
+			if "Fluidsim" in obj.modifiers :
+			#	if fluid.type == 'DOMAIN':
+			#	row.operator("fluid.bake", text="Bake",translate=False, icon='MOD_FLUIDSIM')
+				row.operator("object.bake_fluid", text="Bake",translate=False, icon='MOD_FLUIDSIM')
+			'''
 
 '''
 class BakeFluid(bpy.types.Operator):
