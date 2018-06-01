@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 3),
+	"version": (1, 0, 4),
 	"blender": (2, 79, 0),
 	"location": "Many commands",
 	"description": "Many tools",
@@ -30,57 +30,13 @@ bl_info = {
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
 	}
 
+
 import bpy
 from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
 from bpy.types import Header, Panel
 
-'''
-class VIEW3D_PT_options_bone(bpy.types.Panel):
-	
-	bl_label = "Bone Settings"
-	bl_idname = "BONE_SETTINGS_PANEL"
-	
-	bl_space_type = 'VIEW_3D'
-	bl_region_type = 'TOOLS'
-	bl_category = "Options"
-	
-	bl_context = "armature_edit"
 
 
-	def draw(self, context):
-		bone = context.selected_bones
-		
-	#	if not bone:
-	#		bone = context.edit_bone
-			
-		self.layout.prop(bone, "use_deform", text="")
-'''
-
-class VIEW3D_PT_view3d_display_view_side(Panel):
-	
-	bl_space_type = 'VIEW_3D'
-	bl_region_type = 'UI'
-	bl_label = "View Side"
-	
-	def draw(self, context):
-		
-		layout = self.layout
-		
-		row = layout.row(align = True)
-		row.operator("view3d.viewnumpad", text="Top").type='TOP'
-		
-		box = layout.box()
-		row = box.row(align = True)
-		row.operator("view3d.viewnumpad", text="Front" ).type='FRONT'
-		
-		row = box.row(align = True)
-		row.operator("view3d.viewnumpad", text="Left" ).type='LEFT'
-		row.operator("view3d.viewnumpad", text="Right" ).type='RIGHT'
-		
-		row = box.row(align = True)
-		row.operator("view3d.viewnumpad", text="Back" ).type='BACK'
-	
-	
 ############################ GUI ####################################			
 class ShowCameraView(bpy.types.Operator):
 
@@ -154,7 +110,8 @@ class AnimationPlayRestore(bpy.types.Operator):
 
 		return {'FINISHED'}
 	
-	
+
+# Hotkey for Outliner	
 class HideObjects(bpy.types.Operator):
 	
 	bl_idname = "object.hide_view_and_render"
@@ -292,21 +249,8 @@ class WeightMaskSelect(bpy.types.Operator):
 
 	def execute(self, context):
 		
-		'''
-		if(context.weight_paint_object.data.use_paint_mask_vertex):
-			self.report({'ERROR'}, "Only Face Mask is supported for now!")
-			return {'FINISHED'}	
-		
-		if(context.object.data.use_paint_mask_vertex):
-			self.report({'ERROR'}, "Only Face Mask is supported for now!")
-			return {'FINISHED'}	
-		'''
-		
-	#	bpy.context.object.data.use_paint_mask = True
-
 		bpy.ops.object.editmode_toggle()
 		
-			
 		if(self.selectType == 'More'):
 			bpy.ops.mesh.select_more()
 			
@@ -487,7 +431,7 @@ class JoinObjectsWithUV(bpy.types.Operator):
 
 	
 
-################
+## TEXT EDITOR ###############
 class TextToolsButtons(Header):
 	
 	bl_space_type = 'TEXT_EDITOR'
@@ -571,7 +515,7 @@ class SetInOutRange(bpy.types.Operator):
 		return {'FINISHED'}	
 		
 
-# SHOW MATERIAL SETTINGS #	
+## SHOW MATERIAL SETTINGS #	
 class ShowMaterial(bpy.types.Operator):
 
 	'''Show Material'''
@@ -664,29 +608,6 @@ class ProportionalSwitcher(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
-#class SelectRecursiveAndShow(bpy.types.Operator):
-
-#	'''Select Recursive and Show'''
-'''
-	bl_idname = "outliner.select_recursive_and_show"
-	bl_label = "Select Recursive and Show"
-	bl_options = {'REGISTER', 'UNDO'}
-
-
-	def execute(self, context):
-		
-		bpy.ops.outliner.item_activate('INVOKE_DEFAULT')
-
-		
-		
-	#	# show all
-	#	for obj in bpy.context.selected_objects:
-	#		obj.hide = False
-			
-	#	bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
-				
-		return {'FINISHED'}	
-'''	
 
 class SwitchWeight(bpy.types.Operator):
 
@@ -725,6 +646,7 @@ class MarkSeamWithDisplay(bpy.types.Operator):
 		bpy.context.object.data.show_edge_bevel_weight = False
 				
 		return {'FINISHED'}
+
 	
 # TIMELINE #	
 def TIMELINE_HT_AudioMute(self, context):
@@ -737,7 +659,6 @@ def TIMELINE_HT_AudioMute(self, context):
 		icon = "MUTE_IPO_OFF"
 
 	row = layout.row(align=True)
-#	row.separator()
 	row.operator( "screen.audio_mute_toggle", text = "Audio", icon = icon )
 		
 		
