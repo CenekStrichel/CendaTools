@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Export FBX",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 7),
+	"version": (1, 0, 8),
 	"blender": (2, 79, 0),
 	"location": "Export settings in Scene Properties, Export button in Header View3D",
 	"description": "Export selected objects to destination (FBX) with override per object",
@@ -393,28 +393,30 @@ class ExportToPlace(bpy.types.Operator):
 
 def ExportLayout(self, context):
 
-	#################################################
-	# export
-	layout = self.layout
-	row = layout.row(align=True)
-	
-	if(bpy.context.active_object.mode  == 'OBJECT'):
-		row.enabled = True
-	else:
-		row.enabled = False
+	space = bpy.context.space_data
 		
-	# only first override is used
-	textExport = context.scene.ExportPath.rsplit('\\', 1)[-1]
-#	icon = "EXPORT"
-	
-	for obj in bpy.context.selected_objects:
-		if( obj.ExportOverride ):
-			textExport = "[ " + context.object.ExportPathOverride.rsplit('\\', 1)[-1] + " ]"	
-		#	icon = "PMARKER_ACT"
-			break
+	# Normal view
+	if(space.region_3d.view_perspective != 'CAMERA'): # only for camera
 		
-	if(len(textExport) > 0):
-		row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
+		# export
+		layout = self.layout
+		row = layout.row(align=True)
+		
+		if(bpy.context.active_object.mode  == 'OBJECT'):
+			row.enabled = True
+		else:
+			row.enabled = False
+			
+		# only first override is used
+		textExport = context.scene.ExportPath.rsplit('\\', 1)[-1]
+		
+		for obj in bpy.context.selected_objects:
+			if( obj.ExportOverride ):
+				textExport = "[ " + context.object.ExportPathOverride.rsplit('\\', 1)[-1] + " ]"
+				break
+			
+		if(len(textExport) > 0):
+			row.operator("cenda.export_to_place", icon = "EXPORT", text = textExport)
 
 		
 		
