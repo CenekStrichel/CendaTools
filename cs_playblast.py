@@ -69,11 +69,12 @@ class Playblast(bpy.types.Operator):
 	def execute(self, context):
 
 		previous = bpy.context.scene.render.image_settings.file_format
-
-		rd = bpy.context.scene.render
-		rd.image_settings.file_format = "FFMPEG"
-		rd.ffmpeg.format = "MPEG4"
-		rd.ffmpeg.codec = "H264"
+		
+		if(previous != "FFMPEG"):
+			rd = bpy.context.scene.render
+			rd.image_settings.file_format = "FFMPEG"
+			rd.ffmpeg.format = "MPEG4"
+			rd.ffmpeg.codec = "H264"
 
 		try:
 			bpy.ops.render.opengl(animation=True)
@@ -82,14 +83,12 @@ class Playblast(bpy.types.Operator):
 		except:
 			self.report({'ERROR'}, "Scene has to be saved first!")
 			
-		bpy.context.scene.render.image_settings.file_format = previous
+		if(previous != "FFMPEG"):
+			bpy.context.scene.render.image_settings.file_format = previous
 
 		return {'FINISHED'}
 	
 	
-
-
-		
 ################################################################
 # register #
 
