@@ -32,7 +32,7 @@ bl_info = {
 
 
 import bpy
-from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
+from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty, FloatProperty
 from bpy.types import Header, Panel
 
 
@@ -673,7 +673,35 @@ class AudioMuteToggle(bpy.types.Operator):
 
 		return {'FINISHED'}	
 		
-							
+		
+class AddMistPass(bpy.types.Operator):
+
+
+	bl_idname = "scene.add_mist_pass"
+	bl_label = "Add Mist Pass"
+	bl_options = {'REGISTER', 'UNDO'}
+	
+	start = FloatProperty( name="Start", default=5 )
+	depth = FloatProperty( name="Depth", default=25 )
+	
+	def execute(self, context):
+	
+		# activate mist pass
+		bpy.context.scene.render.layers[ bpy.context.scene.render.layers.active.name ].use_pass_mist = True
+
+		bpy.context.scene.world.mist_settings.start = self.start
+		bpy.context.scene.world.mist_settings.depth = self.depth
+
+		# show mist settings
+		if(bpy.context.scene.objects.active.type == "CAMERA"):
+			bpy.context.scene.objects.active.data.show_mist = True
+			
+		elif(bpy.context.scene.camera != None):
+			bpy.context.scene.camera.data.show_mist = True
+
+		return {'FINISHED'}	
+			
+								
 ################################################################
 # register #
 
