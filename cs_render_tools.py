@@ -18,12 +18,12 @@
 
 
 bl_info = {
-	"name": "Render Region",
+	"name": "Render Tools",
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
-	"description": "Rendering in viewport",
-	"location": "Hotkey",
-	"version": (1, 0, 0),
+	"description": "Render Region & Render without file output",
+	"location": "Hotkey (commands)",
+	"version": (1, 0, 1),
 	"blender": (2, 79, 0),
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
@@ -32,7 +32,13 @@ bl_info = {
 
 import bpy
 
+from bpy.app.handlers import persistent
+from bpy.props import StringProperty
 
+
+################################################################
+# RENDER REGION #
+################################################################
 class RenderRegion(bpy.types.Operator):
 	
 	bl_idname = "view3d.render_region"
@@ -66,11 +72,64 @@ class RenderRegion(bpy.types.Operator):
 		
 		return {'FINISHED'}
 	
+	
+################################################################
+# RENDER WITHOUT FILE OUTPUT
+################################################################
+class RenderWithoutFileOutput(bpy.types.Operator):
+
+
+	bl_idname = "render.render_without_fileoutput"
+	bl_label = "Render without File Output"
+	bl_options = {'REGISTER'}
+	
+	bpy.types.Scene.FileOutput = StringProperty( 
+	name = "", 
+	default = "",
+	description = "")
+	
+	def execute(self, context):
 		
+		# switch on nodes and get reference #
+		if(bpy.context.scene.use_nodes):
+
+			# disable all output
+			for node in bpy.context.scene.node_tree.nodes:
+				if( node.type == "OUTPUT_FILE" ):
+					if(node.mute == False):	
+						context.scene.FileOutput += node.name + ";"	# saved all except disabled
+						node.mute = True
+				
+		# rendering #
+		bpy.ops.render.render("INVOKE_DEFAULT", animation=False, write_still=False, use_viewport=False )
+		
+		return {'FINISHED'}
+
+
+@persistent
+def render_handler(scene):
+	
+    # enable back output #	
+	if(bpy.context.scene.use_nodes):
+		
+		if(len(bpy.context.scene.FileOutput) > 0):
+
+			fileOutputs = bpy.context.scene.FileOutput.split(";")
+			
+			for f in fileOutputs:
+				for node in bpy.context.scene.node_tree.nodes:
+					if( node.type == "OUTPUT_FILE" ):
+						if(node.name == f):
+							node.mute = False
+									
+			bpy.context.scene.FileOutput = ""
+
+
 ################################################################
 # register #
 def register():
 	bpy.utils.register_module(__name__)
+	bpy.app.handlers.render_post.append(render_handler)
 	
 def unregister():
 	bpy.utils.unregister_module(__name__)
