@@ -94,7 +94,8 @@ class SetEditorSettings(bpy.types.Operator):
 	
 	
 def menu_func(self, context):
-    self.layout.operator( SetEditorSettings.bl_idname, icon="PREFERENCES" )
+	self.layout.separator()
+	self.layout.operator( SetEditorSettings.bl_idname, icon="PREFERENCES" )
 			
 				
 ################################################################
