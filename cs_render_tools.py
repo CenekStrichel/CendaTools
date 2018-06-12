@@ -23,7 +23,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"description": "Render Region & Render without file output",
 	"location": "Hotkey (commands)",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
@@ -41,17 +41,25 @@ from bpy.props import StringProperty
 ################################################################
 class RenderRegion(bpy.types.Operator):
 	
+	
 	bl_idname = "view3d.render_region"
 	bl_label = "Render region"
+	
+	bpy.types.Scene.ViewportShading = StringProperty( 
+	name = "", 
+	default = "",
+	description = "")
+	
 	
 	def execute(self, context):
 		
 		
 		if( bpy.context.space_data.viewport_shade == 'RENDERED' ):
-			bpy.context.space_data.viewport_shade = 'MATERIAL'
+			bpy.context.space_data.viewport_shade = context.scene.ViewportShading # 'MATERIAL'
 			bpy.ops.view3d.clear_render_border()
 
 		else:
+			context.scene.ViewportShading = bpy.context.space_data.viewport_shade
 			bpy.ops.view3d.render_border('INVOKE_DEFAULT')
 			bpy.context.space_data.viewport_shade = 'RENDERED'
 			
