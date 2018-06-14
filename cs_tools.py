@@ -227,6 +227,7 @@ class FrameCurve(bpy.types.Operator):
 		return {'FINISHED'}	
 
 
+# Shrink and Grow selected face mask
 class WeightMaskSelect(bpy.types.Operator):
 	
 	bl_idname = "paint.weight_mask_select"
@@ -512,7 +513,7 @@ class SetInOutRange(bpy.types.Operator):
 		return {'FINISHED'}	
 		
 
-## SHOW MATERIAL SETTINGS #	
+## SHOW MATERIAL SETTINGS in Properties and Node Editor #	
 class ShowMaterial(bpy.types.Operator):
 
 	'''Show Material'''
@@ -605,7 +606,7 @@ class ProportionalSwitcher(bpy.types.Operator):
 		return {'FINISHED'}
 	
 	
-
+# Switch like in the Photoshop ("X" key)
 class SwitchWeight(bpy.types.Operator):
 
 	'''Switch Weight value from 1 to 0'''
@@ -624,7 +625,8 @@ class SwitchWeight(bpy.types.Operator):
 	
 		return {'FINISHED'}
 	
-	
+
+# set UV mark and set seam to view	
 class MarkSeamWithDisplay(bpy.types.Operator):
 
 	'''Mark UV seam with display'''
@@ -671,7 +673,7 @@ class AudioMuteToggle(bpy.types.Operator):
 		return {'FINISHED'}	
 		
 
-# Add mist with settings (start and depth)		
+# Add mist with settings (start and depth), it is just command for call		
 class AddMistPass(bpy.types.Operator):
 
 
@@ -681,6 +683,7 @@ class AddMistPass(bpy.types.Operator):
 	
 	start = FloatProperty( name="Start", default=5 )
 	depth = FloatProperty( name="Depth", default=25 )
+	
 	
 	def execute(self, context):
 	
