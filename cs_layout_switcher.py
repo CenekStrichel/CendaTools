@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Layout Switcher",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"location": "Info header",
 	"description": "Switch layout with buttons on Info header",
@@ -38,9 +38,9 @@ from bpy.types import Header, Panel
 import platform
 
 
-################
+#################
 # AUTO IK CHAIN #
-################
+#################
 
 class SwitchLatout(bpy.types.Operator):
 
@@ -52,10 +52,25 @@ class SwitchLatout(bpy.types.Operator):
 	
 	
 	def execute(self, context):
+		
 		try:
 			bpy.context.window.screen = bpy.data.screens[ self.layoutName ]
+			
 		except:
-			self.report({'ERROR'}, "Can not find layout: \"" + self.layoutName + "\"")
+		#	bpy.ops.screen.new() # duplicate current
+			
+			bpy.context.window.screen.name = self.layoutName
+		#	bpy.context.window.screen = bpy.data.screens[ self.layoutName ]
+			
+			# rename old
+			'''
+			for s in bpy.data.screens:
+				bpy.context.window.screen.name = s.name.replace(".001","")
+				bpy.context.window.screen.name = s.name.replace(".002","")
+				bpy.context.window.screen.name = s.name.replace(".003","")
+				bpy.context.window.screen.name = s.name.replace(".004","")
+			'''	
+			self.report({'WARNING'}, "Current layout was renamed!")
 			
 		return {'FINISHED'}
 
@@ -83,21 +98,12 @@ def switchLayout(self, context):
 		prefix = "[M3] "
 		
 	row = layout.row(align=True)
-	
-	'''
-	if(prefix == ""):
-
-		row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = "1 Generic"
-		row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = "2 Animation"
-		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "3 Composition"
-		row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = "4 Scripting"
-	else:
-	'''	
-	
+		
 	row.operator(SwitchLatout.bl_idname, text = "Generic", icon = "VIEW3D").layoutName = (prefix + "1 Generic")
 	row.operator(SwitchLatout.bl_idname, text = "Animation", icon = "IPO").layoutName = (prefix + "2 Animation")
 	row.operator(SwitchLatout.bl_idname, text = "Composition", icon = "NODETREE").layoutName = (prefix + "3 Composition")
 	row.operator(SwitchLatout.bl_idname, text = "", icon = "TEXT").layoutName = (prefix + "4 Scripting")
+
 
 ################################################################
 # register 
