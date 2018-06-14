@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 4),
+	"version": (1, 0, 5),
 	"blender": (2, 79, 0),
 	"location": "Many commands",
 	"description": "Many tools",
@@ -37,7 +37,8 @@ from bpy.types import Header, Panel
 
 
 
-############################ GUI ####################################			
+############################ GUI ####################################	
+# replace for classic camera view (NUM 0)		
 class ShowCameraView(bpy.types.Operator):
 
 	bl_idname = "screen.show_camera_view"
@@ -65,7 +66,7 @@ class ShowCameraView(bpy.types.Operator):
 	
 	
 ################################################################
-# play animation and stop with restore time position
+# play animation and stop with restore time position for easy animation play
 class AnimationPlayRestore(bpy.types.Operator):
 
 	bl_idname = "screen.animation_play_restore"
@@ -117,12 +118,6 @@ class HideObjects(bpy.types.Operator):
 	bl_idname = "object.hide_view_and_render"
 	bl_label = "Hide View and Render"
 	
-#	extend = BoolProperty(name="Extend", default=False)
-
-#	@classmethod
-#	def poll(cls, context):
-#		return context.area.type == 'GRAPH_EDITOR'
-
 	def execute(self, context):
 
 		bpy.ops.object.hide_view_set()
@@ -175,7 +170,8 @@ class SelectAndFrame(bpy.types.Operator):
 				
 		return {'FINISHED'}
 
-		
+
+# collapse all channels in animation editor		
 class ResetExpand(bpy.types.Operator):
 	
 	bl_idname = "anim.reset_expand"
@@ -375,6 +371,7 @@ class OrientationSwitcher(bpy.types.Operator):
 '''	
 
 # my isolate version - not working well, don`t use it
+'''
 class IsolateObject(bpy.types.Operator):
 	
 	bl_idname = "view3d.isolate_object"
@@ -397,7 +394,7 @@ class IsolateObject(bpy.types.Operator):
 			bpy.ops.view3d.localview()	
 				 
 		return {'FINISHED'}
-	
+'''	
 	
 # Join object UV to one UV even it has different names	
 class JoinObjectsWithUV(bpy.types.Operator):
@@ -673,7 +670,8 @@ class AudioMuteToggle(bpy.types.Operator):
 
 		return {'FINISHED'}	
 		
-		
+
+# Add mist with settings (start and depth)		
 class AddMistPass(bpy.types.Operator):
 
 
