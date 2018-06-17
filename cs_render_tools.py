@@ -75,22 +75,23 @@ class RenderRegion(bpy.types.Operator):
 	default = "",
 	description = "")
 	
+	'''
 	startX = IntProperty()
 	startY = IntProperty()
-	drawLine = BoolProperty()
-	
+	drawGL = BoolProperty()
+	'''
 	
 	def modal(self, context, event):
-		
-		
-		context.area.tag_redraw()
 
+		context.area.tag_redraw()
 
 		# RETURN BACK #
 		if( bpy.context.space_data.viewport_shade == 'RENDERED' ):
 			
 			bpy.context.space_data.viewport_shade = context.scene.ViewportShading
 			bpy.ops.view3d.clear_render_border()
+			
+			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 			
 			bpy.context.window.cursor_set("DEFAULT")
 			
@@ -113,8 +114,19 @@ class RenderRegion(bpy.types.Operator):
 
 			endX = event.mouse_region_x 
 			endY = event.mouse_region_y 
-			
-			bpy.ops.view3d.render_border(xmin=self.startX, xmax=endX, ymin=endY, ymax=self.startY, camera_only=False)
+
+			if(self.startY > endY and self.startX < endX):
+				bpy.ops.view3d.render_border( xmin=self.startX, xmax=endX, ymin=endY, ymax=self.startY, camera_only=False )
+				
+			elif(self.startY < endY and self.startX > endX):
+				bpy.ops.view3d.render_border( xmin=endX, xmax=self.startX, ymin=self.startY, ymax=endY, camera_only=False )
+				
+			elif(self.startY < endY and self.startX < endX):	
+				bpy.ops.view3d.render_border( xmin=self.startX, xmax=endX, ymin=self.startY, ymax=endY, camera_only=False )
+				
+			elif(self.startY > endY and self.startX > endX):	
+				bpy.ops.view3d.render_border( xmin=endX, xmax=self.startX, ymin=endY, ymax=self.startY, camera_only=False )
+				
 			bpy.context.space_data.viewport_shade = 'RENDERED'
 			
 			# remove draw
@@ -128,8 +140,7 @@ class RenderRegion(bpy.types.Operator):
 		if(self.drawGL):
 			
 			self.mouse_path.append((event.mouse_region_x, event.mouse_region_y))
-		
-		
+
 		return {'RUNNING_MODAL'}
 	
 	
@@ -140,17 +151,15 @@ class RenderRegion(bpy.types.Operator):
 		args = (self, context)
 		self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_PIXEL')
 		self.mouse_path = []
-
+		self.mouse_path.clear()
+		
 		context.window_manager.modal_handler_add(self)
 		
 		bpy.context.window.cursor_set("CROSSHAIR")
 		
 		return {'RUNNING_MODAL'}
 
-	
-	
-	
-	
+
 	'''
 	def execute(self, context):
 		
