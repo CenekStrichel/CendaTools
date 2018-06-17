@@ -33,7 +33,32 @@ bl_info = {
 import bpy
 
 from bpy.app.handlers import persistent
-from bpy.props import StringProperty
+from bpy.props import StringProperty, IntProperty, BoolProperty
+
+import bpy
+import bgl
+import blf
+
+
+def draw_callback_px(self, context):
+
+	bgl.glEnable(bgl.GL_BLEND)
+	bgl.glColor4f(1.0, 0.0, 0.0, 0.5)
+	bgl.glLineWidth(2)
+	
+	bgl.glBegin(bgl.GL_LINE_STRIP)
+	
+	for x, y in self.mouse_path:
+		bgl.glVertex2i(self.startX, y)
+		
+	for x, y in self.mouse_path:	
+		bgl.glVertex2i( x, self.startY)
+		
+	bgl.glEnd()
+	
+	bgl.glLineWidth(1)
+	bgl.glDisable(bgl.GL_BLEND)
+	bgl.glColor4f(1.0, 0.0, 0.0, 1.0)
 
 
 ################################################################
@@ -50,35 +75,102 @@ class RenderRegion(bpy.types.Operator):
 	default = "",
 	description = "")
 	
+	startX = IntProperty()
+	startY = IntProperty()
+	drawLine = BoolProperty()
 	
+	
+	def modal(self, context, event):
+		
+		
+		context.area.tag_redraw()
+
+
+		# RETURN BACK #
+		if( bpy.context.space_data.viewport_shade == 'RENDERED' ):
+			
+			bpy.context.space_data.viewport_shade = context.scene.ViewportShading
+			bpy.ops.view3d.clear_render_border()
+			
+			bpy.context.window.cursor_set("DEFAULT")
+			
+			return {'FINISHED'}
+		
+		
+		# SET REGION #
+		elif event.type == 'LEFTMOUSE' and event.value == 'PRESS':
+
+			context.scene.ViewportShading = bpy.context.space_data.viewport_shade
+			
+			self.startX = event.mouse_region_x 
+			self.startY = event.mouse_region_y 
+			
+			self.drawGL = True
+			
+		
+		# RENDER AFTER SET REGION #
+		elif event.type == 'LEFTMOUSE' and event.value == 'RELEASE':
+
+			endX = event.mouse_region_x 
+			endY = event.mouse_region_y 
+			
+			bpy.ops.view3d.render_border(xmin=self.startX, xmax=endX, ymin=endY, ymax=self.startY, camera_only=False)
+			bpy.context.space_data.viewport_shade = 'RENDERED'
+			
+			# remove draw
+			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+			
+			bpy.context.window.cursor_set("DEFAULT")
+			
+			return {'FINISHED'}
+		
+		
+		if(self.drawGL):
+			
+			self.mouse_path.append((event.mouse_region_x, event.mouse_region_y))
+		
+		
+		return {'RUNNING_MODAL'}
+	
+	
+	def invoke(self, context, event):
+
+		self.drawGL = False
+
+		args = (self, context)
+		self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_PIXEL')
+		self.mouse_path = []
+
+		context.window_manager.modal_handler_add(self)
+		
+		bpy.context.window.cursor_set("CROSSHAIR")
+		
+		return {'RUNNING_MODAL'}
+
+	
+	
+	
+	
+	'''
 	def execute(self, context):
+		
+		print("RENDER")
 		
 		
 		if( bpy.context.space_data.viewport_shade == 'RENDERED' ):
+			
 			bpy.context.space_data.viewport_shade = context.scene.ViewportShading # 'MATERIAL'
 			bpy.ops.view3d.clear_render_border()
 
 		else:
+			
 			context.scene.ViewportShading = bpy.context.space_data.viewport_shade
 			bpy.ops.view3d.render_border('INVOKE_DEFAULT')
 			bpy.context.space_data.viewport_shade = 'RENDERED'
-			
-		'''	
-		global shadeSetting
-
-		if(bpy.context.space_data.use_render_border) :
-			
-			bpy.ops.view3d.clear_render_border()
-			bpy.context.space_data.viewport_shade = shadeSetting
-			
-		else:
-			
-			bpy.ops.view3d.render_border('INVOKE_DEFAULT')
-			shadeSetting = bpy.context.space_data.viewport_shade
-			bpy.context.space_data.viewport_shade = 'RENDERED'
-		'''
+		
 		
 		return {'FINISHED'}
+	'''
 	
 	
 ################################################################
