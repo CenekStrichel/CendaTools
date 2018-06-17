@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Modeling Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"location": "Hotkeys",
 	"description": "Combined modeling tools",
@@ -80,7 +80,7 @@ class Tool_1(bpy.types.Operator):
 class Tool_2(bpy.types.Operator):
 	
 	bl_idname = "mesh.tool_2"
-	bl_label = "Dissolve, Connect & Dissolve"
+	bl_label = "Path Connect & Dissolve Edge & UV Map"
 
 	def execute(self, context):
 		
