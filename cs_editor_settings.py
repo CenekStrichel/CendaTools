@@ -44,6 +44,10 @@ class SetEditorSettings(bpy.types.Operator):
 	bl_options = {'REGISTER', 'UNDO'}
 
 	def execute(self, context):
+		
+		# Render setting
+		bpy.context.scene.render.tile_y = 32
+		bpy.context.scene.render.tile_x = 32
 
 		# UV editor
 		bpy.context.scene.tool_settings.snap_uv_element = 'VERTEX' 
