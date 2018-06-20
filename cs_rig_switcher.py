@@ -24,7 +24,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"description": "Switching between Riggigng modes",
 	"location": "Add to Input: wm.call_menu + VIEW3D_MT_rig_switcher_menu & Armature Setting: Rig Switcher Settings",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
@@ -274,9 +274,8 @@ class ObjectMode(bpy.types.Operator):
 		SetBoneSettings( "OCTAHEDRAL", False, False, False, True )	
 		
 		bpy.ops.object.mode_set(mode='OBJECT')
-	#	bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
-		if(self.selectHierarchy):	
+		if(self.selectHierarchy):
 			bpy.ops.object.select_grouped(extend=True, type='CHILDREN_RECURSIVE')
 
 		return {'FINISHED'}
@@ -300,7 +299,6 @@ class EditMode(bpy.types.Operator):
 		SetBoneSettings( "OCTAHEDRAL", True, True, False, False )
 		
 		bpy.ops.object.mode_set(mode='EDIT')
-	#	bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
 		obj = context.object
 		
@@ -354,29 +352,16 @@ class PoseMode(bpy.types.Operator):
 		obj = context.object
 
 		SetArmatureLayer( obj.PoseModeIndexLayer )
-		SetBoneSettings( "OCTAHEDRAL", False, False, False, True )		
+		SetBoneSettings( "STICK" if obj.Stick else 'OCTAHEDRAL', obj.XRay, False, False, True )		
 		
 		bpy.ops.object.mode_set(mode='POSE')
-	#	bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
 		# solid or wire by setting
 		if(obj.SolidDraw):
 			obj.draw_type = 'SOLID'
 		else:
 			obj.draw_type = 'WIRE'
-		
-		# x ray
-		if(obj.XRay):
-			obj.show_x_ray = True
-		else:
-			obj.show_x_ray = False
-
-		# stick
-		if(obj.Stick):
-			obj.data.draw_type = 'STICK'
-		else:
-			obj.data.draw_type = 'OCTAHEDRAL'
-				
+			
 		# turn off Wire
 		for child in bpy.context.active_object.children :
 			child.show_all_edges = False
@@ -401,29 +386,12 @@ class ParentMode(bpy.types.Operator):
 
 		obj = context.object
 
-		SetArmatureLayer( obj.PoseModeIndexLayer )
-		SetBoneSettings( "OCTAHEDRAL", False, False, False, True )		
+		SetArmatureLayer( None )
+		SetBoneSettings( "OCTAHEDRAL", True, False, False, False )		
 		
 		bpy.ops.object.mode_set(mode='POSE')
-		
-		# solid or wire by setting
-		if(obj.SolidDraw):
-			obj.draw_type = 'SOLID'
-		else:
-			obj.draw_type = 'WIRE'
-		
-		# x ray
-		if(obj.XRay):
-			obj.show_x_ray = True
-		else:
-			obj.show_x_ray = False
-
-		# stick
-		if(obj.Stick):
-			obj.data.draw_type = 'STICK'
-		else:
-			obj.data.draw_type = 'OCTAHEDRAL'
-				
+		obj.draw_type = 'SOLID'
+	
 		# turn off Wire
 		for child in bpy.context.active_object.children :
 			child.show_all_edges = False
