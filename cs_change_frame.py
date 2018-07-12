@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Change Frame",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "Add 'view3d.change_frame_drag' to Input Preferences under 3D View (Global)",
 	"description": "Change frame by dragging",
@@ -41,7 +41,7 @@ class ChangeFrame(bpy.types.Operator):
 	"""Change frame with dragging"""
 	bl_idname = "view3d.change_frame_drag"
 	bl_label = "Change Frame Drag"
-
+	bl_options = {"UNDO_GROUPED", "INTERNAL"}
 
 	autoSensitivity = BoolProperty( name = "Auto Sensitivity" )
 	defaultSensitivity = FloatProperty( name = "Sensitivity", default = 5 )
