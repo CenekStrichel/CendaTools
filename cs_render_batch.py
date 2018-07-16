@@ -45,7 +45,9 @@ class BatchRender(bpy.types.Operator):
 	bl_idname = "screen.batch_render"
 	bl_label = "Create BAT file"
 	bl_options = {'REGISTER', 'UNDO'}
-
+	
+	shutdown = BoolProperty(name="Shutdown", default=False)
+	
 	def execute(self, context):
 		
 		if( len(bpy.data.filepath) == 0 ):
@@ -65,9 +67,17 @@ class BatchRender(bpy.types.Operator):
 
 		# delete bat #
 		batFile = bpy.data.filepath.replace(".blend", ".bat")
+		
+		if(self.shutdown):
+			batFile = batFile.replace(".bat", "_shutdown.bat")
+			
 		command += "\n"
 		command += "del \"" + batFile + "\""
 		
+		if(self.shutdown):
+			command += "\n"
+			command += "shutdown -s -t 10"
+			
 		# save bat #
 		batContent = open( batFile, 'w' )
 		batContent.write( command )	
@@ -85,8 +95,8 @@ class BatchRender(bpy.types.Operator):
 
 def menu_func(self, context):
 	self.layout.separator()
-	self.layout.operator( "screen.batch_render", icon="LINENUMBERS_ON" )
-	
+	self.layout.operator( "screen.batch_render", icon="LINENUMBERS_ON", text = "Create BAT" ).shutdown = False
+	self.layout.operator( "screen.batch_render", icon="LINENUMBERS_ON", text = "Create BAT + Shutdown" ).shutdown = True
 	
 ################################################################
 # register #
