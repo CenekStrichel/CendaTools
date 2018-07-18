@@ -65,19 +65,18 @@ class BatchRender(bpy.types.Operator):
 		command += " --render-anim"
 		command += " --scene " + "\"" + bpy.context.scene.name + "\""
 
-		# delete bat #
 		batFile = bpy.data.filepath.replace(".blend", ".bat")
 		
+		# shutdown #
 		if(self.shutdown):
 			batFile = batFile.replace(".bat", "_shutdown.bat")
-			
-		command += "\n"
-		command += "del \"" + batFile + "\""
-		
-		if(self.shutdown):
 			command += "\n"
 			command += "shutdown -s -t 10"
 			
+		# delete bat #		
+		command += "\n"
+		command += "del \"" + batFile + "\""
+		
 		# save bat #
 		batContent = open( batFile, 'w' )
 		batContent.write( command )	
