@@ -46,16 +46,29 @@ def AnimEditor_Switcher(self, context):
 	user_preferences = context.user_preferences
 	addon_prefs = user_preferences.addons[__name__].preferences
 
-
 	layout = self.layout
+	
+	# Filter by editor #
+	if( not addon_prefs.boolTimeline and context.area.type == "TIMELINE" ):
+		return {'FINISHED'}
+	
+	if( not (addon_prefs.boolGraph or addon_prefs.boolDrivers) and context.area.type == "GRAPH_EDITOR" ):
+		return {'FINISHED'}
+	
+	if( not (addon_prefs.boolDopesheet or addon_prefs.boolAction) and context.area.type == "DOPESHEET_EDITOR" ):
+		return {'FINISHED'}
+	
+	if( not addon_prefs.boolNLA and context.area.type == "NLA_EDITOR" ):
+		return {'FINISHED'}
 	
 	
 	# TIMELINE #
 	if( addon_prefs.boolTimeline ):
-		
+
 		row = layout.row(align=True)
 		row.operator("scene.animation_editor_switcher", text = "", icon = "TIME").editorType = "TIMELINE"
-		
+	
+	
 	# GRAPH #
 	if( addon_prefs.boolGraph or addon_prefs.boolDrivers ):
 		
@@ -67,6 +80,7 @@ def AnimEditor_Switcher(self, context):
 		if( addon_prefs.boolDrivers ):
 			row.operator("scene.animation_editor_switcher", text = "", icon = "DRIVER").editorType = "GRAPH_EDITOR_DRIVERS"
 		
+		
 	# DOPE #	
 	if( addon_prefs.boolDopesheet or addon_prefs.boolAction ):
 		
@@ -77,6 +91,7 @@ def AnimEditor_Switcher(self, context):
 			
 		if( addon_prefs.boolAction ):	
 			row.operator("scene.animation_editor_switcher", text = "", icon = "OBJECT_DATAMODE").editorType = "DOPESHEET_EDITOR_ACTION"
+		
 		
 	# NLA #	
 	if( addon_prefs.boolNLA ):
