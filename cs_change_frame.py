@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Change Frame",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"location": "Add 'view3d.change_frame_drag' to Input Preferences under 3D View (Global)",
 	"description": "Change frame by dragging",
@@ -45,6 +45,8 @@ class ChangeFrame(bpy.types.Operator):
 
 	autoSensitivity = BoolProperty( name = "Auto Sensitivity" )
 	defaultSensitivity = FloatProperty( name = "Sensitivity", default = 5 )
+	renderOnly = BoolProperty( name = "Render Only", default = True )
+	
 	
 	mouseEnum = [
 	("LeftMouse", "Left Mouse", "", "", 0),
@@ -60,6 +62,7 @@ class ChangeFrame(bpy.types.Operator):
 	global sensitivity
 	global previousManipulator
 	global previousOnlyRender
+
 
 	def modal(self, context, event):
 	
@@ -87,7 +90,9 @@ class ChangeFrame(bpy.types.Operator):
 			
 			# previous viewport setting
 			bpy.context.space_data.show_manipulator = self.previousManipulator
-			bpy.context.space_data.show_only_render = self.previousOnlyRender
+			
+			if(self.renderOnly):
+				bpy.context.space_data.show_only_render = self.previousOnlyRender
 
 			# cursor back
 			bpy.context.window.cursor_set("DEFAULT")
@@ -103,8 +108,9 @@ class ChangeFrame(bpy.types.Operator):
 		self.previousManipulator = bpy.context.space_data.show_manipulator
 		bpy.context.space_data.show_manipulator = False
 		
-		self.previousOnlyRender = bpy.context.space_data.show_only_render
-		bpy.context.space_data.show_only_render = True
+		if(self.renderOnly):
+			self.previousOnlyRender = bpy.context.space_data.show_only_render
+			bpy.context.space_data.show_only_render = True
 		
 		
 		# start modal
