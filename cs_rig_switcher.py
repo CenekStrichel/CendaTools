@@ -24,7 +24,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"description": "Switching between Riggigng modes",
 	"location": "Add to Input: wm.call_menu + VIEW3D_MT_rig_switcher_menu & Armature Setting: Rig Switcher Settings",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
@@ -515,16 +515,25 @@ def SetBoneSettings( drawType = "OCTAHEDRAL", show_x_ray = False, show_axes = Fa
 	bpy.context.object.data.show_bone_custom_shapes = show_bone_custom_shapes
 	
 	
-def DeselectableAllMeshes( state = True ):
+def DeselectableAllMeshes( state = True ):	
 	
-	# armature is active
-	for child in bpy.context.active_object.children :
+	SelectableRecursive( bpy.context.active_object, state )
 		
+				
+def SelectableRecursive(ob, state):
+	
+    # armature is active
+	for child in ob.children :
+		
+		####################################
 		child.hide_select = state
 		
 		# deselect all child meshes
 		if(state):
-			child.select = False # select this object
+			child.select = False # deselect object
+			
+	# for recursive		
+	SelectableRecursive(child, state) 
 
 
 def HideLODs( state = True ):
@@ -567,8 +576,6 @@ class WireAllMeshes(bpy.types.Operator):
 	"""Set selected object to Wire mode"""
 	bl_idname = "cenda.wire_on_shaded"
 	bl_label = "Wire on Shaded"
-	
-#	state = bpy.props.BoolProperty(name="State",default=True)
 	
 	def execute(self, context):
 		
