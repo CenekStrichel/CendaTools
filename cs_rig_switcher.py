@@ -532,8 +532,8 @@ def SelectableRecursive(ob, state):
 		if(state):
 			child.select = False # deselect object
 			
-	# for recursive		
-	SelectableRecursive(child, state) 
+		# for recursive		
+		SelectableRecursive(child, state) 
 
 
 def HideLODs( state = True ):
