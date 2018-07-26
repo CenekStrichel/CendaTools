@@ -38,6 +38,7 @@ from bpy.types import  Panel
 
 
 class VIEW3D_PT_Bones_Color(Panel):
+
 	
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'UI'
@@ -46,14 +47,13 @@ class VIEW3D_PT_Bones_Color(Panel):
 	
 	@classmethod
 	def poll(cls, context):
-		return context.active_object.type == 'ARMATURE' and context.active_object.mode == 'POSE'
+		return (context.active_object != None and context.active_object.type == 'ARMATURE' and context.active_object.mode == 'POSE')
 	
 	
 	def draw(self, context):
-		
+
 		layout = self.layout
-		
-		
+
 		row = layout.row(align = True)
 		row.operator("view3d.set_bone_color", text="Red", icon = "COLORSET_01_VEC").themeName='THEME01'
 		row.operator("view3d.set_bone_color", text="Orange", icon = "COLORSET_02_VEC").themeName='THEME02'
@@ -84,7 +84,7 @@ class VIEW3D_PT_Bones_Color(Panel):
 		
 		row = layout.row(align = True)
 		row.operator("view3d.set_bone_color", text="Green D", icon = "COLORSET_15_VEC").themeName='THEME15'
-		
+	
 		
 class SetBoneColor(bpy.types.Operator):
 
