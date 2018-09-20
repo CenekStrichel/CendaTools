@@ -21,9 +21,9 @@
 bl_info = {
 	"name": "Batch Render",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
+	"version": (1, 0, 1),
 	"blender": (2, 7, 9),
-	"location": "Render > Create BAT File",
+	"location": "Render > BATs commands",
 	"description": "Create BAT file for easy rendering",
 	"category": "Cenda Tools",
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
@@ -33,6 +33,7 @@ bl_info = {
 
 import bpy
 import os
+
 from platform import system as currentOS
 from bpy.types import Header, Menu
 from bpy.props import StringProperty, BoolProperty
@@ -41,12 +42,13 @@ from bpy.props import StringProperty, BoolProperty
 # change object mode by selection			
 class BatchRender(bpy.types.Operator):
 
-	'''Batch Render'''
+	'''Create BAT file'''
 	bl_idname = "screen.batch_render"
 	bl_label = "Create BAT file"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = {'REGISTER'}
 	
 	shutdown = BoolProperty(name="Shutdown", default=False)
+	range = BoolProperty(name="Range", default=False)
 	
 	def execute(self, context):
 		
@@ -62,8 +64,15 @@ class BatchRender(bpy.types.Operator):
 		command = 'start "Render" /b /low /wait '
 		command += "\"" + bpy.app.binary_path + "\""
 		command += " --background" + " \"" + bpy.data.filepath + "\""
+		
+		# range #
+		if(self.range):
+			start = str(context.scene.frame_preview_start)
+			end = str(context.scene.frame_preview_end)
+			command += " --frame-start " + start + " --frame-end " + end
+			
 		command += " --render-anim"
-		command += " --scene " + "\"" + bpy.context.scene.name + "\""
+		command += " --scene " + "\"" + context.scene.name + "\""
 
 		batFile = bpy.data.filepath.replace(".blend", ".bat")
 		
@@ -93,9 +102,23 @@ class BatchRender(bpy.types.Operator):
 
 
 def menu_func(self, context):
+	
 	self.layout.separator()
-	self.layout.operator( "screen.batch_render", icon="LINENUMBERS_ON", text = "Create BAT" ).shutdown = False
-	self.layout.operator( "screen.batch_render", icon="LINENUMBERS_ON", text = "Create BAT + Shutdown" ).shutdown = True
+	
+	op = self.layout.operator( "screen.batch_render", icon="RESTRICT_RENDER_OFF", text = "BAT" )
+	op.shutdown = False
+	op.range = False
+
+	op = self.layout.operator( "screen.batch_render", icon="RESTRICT_RENDER_ON", text = "BAT with Shutdown" )
+	op.shutdown = True
+	op.range = False
+	
+	start = str(context.scene.frame_preview_start)
+	end = str(context.scene.frame_preview_end)
+	op = self.layout.operator( "screen.batch_render", icon="PREVIEW_RANGE", text = "BAT with Range [" + start + " - " + end + "]" )
+	op.shutdown = False
+	op.range = True
+	
 	
 ################################################################
 # register #
