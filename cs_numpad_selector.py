@@ -21,7 +21,7 @@ bl_info = {
 	"name": "Numpad Selector",
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"description": "Selecting bones with numeric keys",
 	"location": "Armature Properties + Set hotkey with 'view3d.num_select'",
@@ -32,8 +32,21 @@ bl_info = {
 
 import bpy
 from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
+from bpy.types import AddonPreferences, Operator
 
 
+class NumpadSelectorAddonPreferences(AddonPreferences):
+
+	bl_idname = __name__
+
+	boolCameraView = BoolProperty( name="Camera View when not Initialized", default=False )
+	
+	def draw(self, context):
+	
+		layout = self.layout
+		layout.prop(self, "boolCameraView")
+		
+		
 class NumControlPanel(bpy.types.Panel):
 	
 	"""Creates a Panel in the scene context of the properties editor"""
@@ -455,10 +468,23 @@ class NumControlSelect(bpy.types.Operator):
 					AutoIKSetting(ob["Num"+num+"AutoIKD"])
 					
 			except:
-				if( not ob.Initialized ):
-					self.report({'ERROR'}, "Bone selector was not Initialized\nUse Initialize in the Armature setting")
-				else:
-					self.report({'WARNING'}, "Bone was not found")
+				
+				try:
+					if( not ob.Initialized ):
+						self.report({'ERROR'}, "Bone selector was not initialized\nUse Initialize in the Armature setting")
+					else:
+						self.report({'WARNING'}, "Bone was not found")
+						
+				except:
+					
+					user_preferences = context.user_preferences
+					addon_prefs = user_preferences.addons[__name__].preferences
+					
+					if(addon_prefs.boolCameraView):
+						bpy.ops.screen.show_camera_view()
+					else:
+						self.report({'ERROR'}, "Bone selector was not initialized\nUse Initialize in the Armature setting")	
+					
 				
 		# for AutoIK toggle	(my another addon)	
 		# redraw 
