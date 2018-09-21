@@ -90,7 +90,6 @@ class SetEditorSettings(bpy.types.Operator):
 				elif(space.type == 'TIMELINE'):
 					space.show_frame_indicator = True
 
-			#	print( space.type  )
 			
 		print("All editors setted")
 		
