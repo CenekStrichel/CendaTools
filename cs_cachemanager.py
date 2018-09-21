@@ -21,7 +21,7 @@ bl_info = {
 	"name": "Cache Manager",
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 0),
+	"version": (1, 0, 1),
 	"blender": (2, 79, 0),
 	"description": "Manager for cache files of physics files",
 	"location": "Properties physics panel",
@@ -34,12 +34,13 @@ import bpy
 import os
 import subprocess
 
+from shutil import copyfile
 from bpy.props import IntProperty, BoolProperty, FloatProperty, StringProperty, EnumProperty
 
 
 class CacheDeletePanel(bpy.types.Panel):
 	
-	"""Creates a Panel in the scene context of the properties editor"""
+	"""Cache Manager Panel"""
 	bl_label = "Cache Manager"
 	bl_idname = "CACHEMANAGER_PT_layout"
 	bl_space_type = 'PROPERTIES'
@@ -67,7 +68,10 @@ class CacheDeletePanel(bpy.types.Panel):
 				
 				# cache file name
 				row = layout.row(align=True)
-				row.prop( obj, "CacheDeleteFile" )
+				row = row.box()
+				
+				row.operator("view3d.play_stop_end", text = "Play (Stop end)", icon = "PLAY") # Play stop end
+				row.prop( obj, "CacheDeleteFile" ) # Cache File
 
 				# cache file warning
 				if(len(context.object.CacheDeleteFile) > 0):
@@ -75,24 +79,102 @@ class CacheDeletePanel(bpy.types.Panel):
 					filepath = bpy.data.filepath.split("\\")
 					file = filepath[ len(filepath)-1 ].replace(".blend","")
 					directory = bpy.data.filepath.replace(filepath[ len(filepath)-1 ], "")
-					frame = bpy.context.scene.frame_current + 1 # +1 because zero is not cached
+					frame = bpy.context.scene.frame_current 
+					
+					cachePresent = False
 					fileCache = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_" + str(frame).zfill(6) + "_00.bphys" )
 					
 					if(os.path.isfile( fileCache )):
+						cachePresent = True
+						
+					# +1 because zero is not cached
+					fileCache = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_" + str(frame+1).zfill(6) + "_00.bphys" ) 
+					
+					if(os.path.isfile( fileCache )):
+						cachePresent = True
+					
+					fileCacheInitial = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_initial_state.bphys" )
+					
+					
+					# open folder	
+					row.operator("view3d.cache_file_folder_open", text = "Open Cache Folder", icon = "FILE_FOLDER")	# Open Cache Folder button
+					
+					row = layout.row(align=True)
+					
+					if( cachePresent ):
 
 						# cache delete button
 						row = layout.row(align=True)
-						row.operator("view3d.cache_delete_files", text = "Delete Cache", icon = "CANCEL")
+						row.operator("view3d.cache_delete_files", text = "Delete Cache", icon = "CANCEL") # Delete Cache button
 						
-				# open folder
-				row = layout.row(align=True)	
-				row.operator("view3d.cache_file_folder_open", text = "Open Cache Folder", icon = "FILE_FOLDER")	
-					
+						# initial state
+						row = layout.row(align=True)
+						row.operator("view3d.save_initial_state", text = "Save Initial State", icon = "COPYDOWN") # Set Initial State button
+
+						if( (os.path.isfile( fileCacheInitial )) ):
+							row.operator("view3d.load_initial_state", text = "Load Initial State", icon = "PASTEDOWN") # Set Initial State button	
+							
+					elif(os.path.isfile( fileCacheInitial )):
+						row = layout.row(align=True)
+						row.operator("view3d.load_initial_state", text = "Load Initial State", icon = "PASTEDOWN") # Set Initial State button
+						
+						
 		if(domainFound == False):
 			row = layout.row(align=True)
 			row.label("Select Smoke Object")
+			
 
-	
+class SaveInitialState(bpy.types.Operator):
+
+	"""Save Initial State"""
+	bl_label = "Save Initial State"
+	bl_idname = "view3d.save_initial_state"
+
+	def execute(self, context):
+		
+		filepath = bpy.data.filepath.split("\\")
+		file = filepath[ len(filepath)-1 ].replace(".blend","")
+		directory = bpy.data.filepath.replace(filepath[ len(filepath)-1 ], "")
+		frame = bpy.context.scene.frame_current
+		
+		fileCache = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_" + str(frame).zfill(6) + "_00.bphys" )
+		fileCacheInitial = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_initial_state.bphys" ) # save
+		
+		copyfile(fileCache, fileCacheInitial)
+		
+		return {'FINISHED'}
+		
+		
+class LoadInitialState(bpy.types.Operator):
+
+	"""Load Initial State"""
+	bl_label = "Load Initial State"
+	bl_idname = "view3d.load_initial_state"
+
+	def execute(self, context):
+		
+		filepath = bpy.data.filepath.split("\\")
+		file = filepath[ len(filepath)-1 ].replace(".blend","")
+		directory = bpy.data.filepath.replace(filepath[ len(filepath)-1 ], "")
+		
+		if(bpy.context.scene.use_preview_range):
+			startFrame = bpy.context.scene.frame_preview_start+1
+		else:
+			startFrame = bpy.context.scene.frame_start+1
+			
+		fileCacheInitial = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_initial_state.bphys" ) # load previous	
+		
+		fileCache = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_" + str( startFrame ).zfill(6) + "_00.bphys" )
+		copyfile(fileCacheInitial, fileCache)
+		
+		fileCache = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_" + str( startFrame-1 ).zfill(6) + "_00.bphys" )
+		copyfile(fileCacheInitial, fileCache)
+		
+		bpy.ops.screen.frame_jump() # skoci na zacatek
+		
+		return {'FINISHED'}
+			
+			
 class OpenCacheFolder(bpy.types.Operator):
 
 	"""Open folder with cache"""
@@ -108,11 +190,47 @@ class OpenCacheFolder(bpy.types.Operator):
 		subprocess.Popen("explorer "+finalDirectory)
 
 		return {'FINISHED'}
+	
+	
+class PlayStopEnd(bpy.types.Operator):
+
+	"""Play Stop End"""
+	bl_idname = "view3d.play_stop_end"
+	bl_label = "Play Stop End"
+	
+	previousState = ""
+	
+	def modal(self, context, event):
 		
+		if(bpy.context.scene.use_preview_range):
+			endFrame = bpy.context.scene.frame_preview_end
+		else:
+			endFrame = bpy.context.scene.frame_end
+			
+		if( (bpy.context.scene.frame_current >= endFrame) or (event.type == 'ESC') ):
+			
+			bpy.ops.screen.animation_cancel(restore_frame=False)
+			bpy.context.scene.sync_mode = self.previousState # load
+			
+			return {'FINISHED'}
+
+		return {'RUNNING_MODAL'}
+	
+	def invoke(self, context, event):
+		
+		self.previousState = bpy.context.scene.sync_mode # save
+		bpy.context.scene.sync_mode = 'NONE'
+		
+		bpy.ops.screen.animation_play()
+
+		context.window_manager.modal_handler_add(self)
+		
+		return {'RUNNING_MODAL'}
+	
 		
 class CacheDelete(bpy.types.Operator):
 
-	"""Creates a Panel in the scene context of the properties editor"""
+	"""Delete cache by current time range"""
 	bl_label = "Delete cache files"
 	bl_idname = "view3d.cache_delete_files"
 
@@ -148,6 +266,8 @@ class CacheDelete(bpy.types.Operator):
 
 			except OSError:
 				pass
+			
+		bpy.ops.screen.frame_jump() # skoci na zacatek
 			
 		return {'FINISHED'}
 
