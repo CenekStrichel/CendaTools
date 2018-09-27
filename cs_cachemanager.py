@@ -21,7 +21,7 @@ bl_info = {
 	"name": "Cache Manager",
 	"category": "Cenda Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"description": "Manager for cache files of physics files",
 	"location": "Properties physics panel",
@@ -62,15 +62,21 @@ class CacheDeletePanel(bpy.types.Panel):
 		
 		for modifier in obj.modifiers:
 			if modifier.type == 'SMOKE':
-			#	if modifier.smoke_type == 'DOMAIN':
 					
 				domainFound = True
 				
 				# cache file name
 				row = layout.row(align=True)
-				row = row.box()
+			#	row = row.box()
 				
-				row.operator("view3d.play_stop_end", text = "Play (Stop end)", icon = "PLAY") # Play stop end
+				row.scale_y = 2
+				row.operator("view3d.play_stop_end", text = "Play Once (any key to Stop)", icon = "PLAY") # Play stop end
+				
+			#	row.scale_y = 1				
+			#	row.operator("view3d.bake_from_cache", text = "Bake from cache" ) # Play stop end
+			
+				row = layout.row(align=True)
+				row = row.box()
 				row.prop( obj, "CacheDeleteFile" ) # Cache File
 
 				# cache file warning
@@ -122,8 +128,23 @@ class CacheDeletePanel(bpy.types.Panel):
 		if(domainFound == False):
 			row = layout.row(align=True)
 			row.label("Select Smoke Object")
-			
 
+'''			
+class BakeFromCache(bpy.types.Operator):
+
+	"""Bake from Cache"""
+	bl_label = "Bake from Cache"
+	bl_idname = "view3d.bake_from_cache"
+
+	def execute(self, context):
+		
+		a = {}
+		a['point_cache'] = bpy.data.objects['Cube'].particle_systems['ParticleSystem'].point_cache
+		bpy.ops.ptcache.bake_from_cache(a)
+
+		return {'FINISHED'}
+'''	
+	
 class SaveInitialState(bpy.types.Operator):
 
 	"""Save Initial State"""
@@ -138,6 +159,7 @@ class SaveInitialState(bpy.types.Operator):
 		frame = bpy.context.scene.frame_current
 		
 		fileCache = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_" + str(frame).zfill(6) + "_00.bphys" )
+		
 		fileCacheInitial = (directory + "blendcache_" + file + "\\" + context.object.CacheDeleteFile + "_initial_state.bphys" ) # save
 		
 		copyfile(fileCache, fileCacheInitial)
@@ -191,42 +213,6 @@ class OpenCacheFolder(bpy.types.Operator):
 
 		return {'FINISHED'}
 	
-	
-class PlayStopEnd(bpy.types.Operator):
-
-	"""Play Stop End"""
-	bl_idname = "view3d.play_stop_end"
-	bl_label = "Play Stop End"
-	
-	previousState = ""
-	
-	def modal(self, context, event):
-		
-		if(bpy.context.scene.use_preview_range):
-			endFrame = bpy.context.scene.frame_preview_end
-		else:
-			endFrame = bpy.context.scene.frame_end
-			
-		if( (bpy.context.scene.frame_current >= endFrame) or (event.type == 'ESC') ):
-			
-			bpy.ops.screen.animation_cancel(restore_frame=False)
-			bpy.context.scene.sync_mode = self.previousState # load
-			
-			return {'FINISHED'}
-
-		return {'RUNNING_MODAL'}
-	
-	def invoke(self, context, event):
-		
-		self.previousState = bpy.context.scene.sync_mode # save
-		bpy.context.scene.sync_mode = 'NONE'
-		
-		bpy.ops.screen.animation_play()
-
-		context.window_manager.modal_handler_add(self)
-		
-		return {'RUNNING_MODAL'}
-	
 		
 class CacheDelete(bpy.types.Operator):
 
@@ -272,6 +258,42 @@ class CacheDelete(bpy.types.Operator):
 		return {'FINISHED'}
 
 
+class PlayStopEnd(bpy.types.Operator):
+
+	"""Play Stop End"""
+	bl_idname = "view3d.play_stop_end"
+	bl_label = "Play Stop End"
+	
+	previousState = ""
+	
+	def modal(self, context, event):
+		
+		if(bpy.context.scene.use_preview_range):
+			endFrame = bpy.context.scene.frame_preview_end
+		else:
+			endFrame = bpy.context.scene.frame_end
+			
+		if( (bpy.context.scene.frame_current >= endFrame) or (event.value == 'PRESS') ):
+			
+			bpy.ops.screen.animation_cancel(restore_frame=False)
+			bpy.context.scene.sync_mode = self.previousState # load
+			
+			return {'FINISHED'}
+
+		return {'RUNNING_MODAL'}
+	
+	def invoke(self, context, event):
+		
+		self.previousState = bpy.context.scene.sync_mode # save
+		bpy.context.scene.sync_mode = 'NONE'
+		
+		bpy.ops.screen.animation_play()
+
+		context.window_manager.modal_handler_add(self)
+		
+		return {'RUNNING_MODAL'}
+
+	
 ############################################################################################
 def register():
 	bpy.utils.register_module(__name__)
