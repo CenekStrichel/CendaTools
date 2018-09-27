@@ -85,6 +85,7 @@ class RenderRegion(bpy.types.Operator):
 
 		context.area.tag_redraw()
 
+
 		# RETURN BACK #
 		if( bpy.context.space_data.viewport_shade == 'RENDERED' ):
 			
@@ -136,6 +137,12 @@ class RenderRegion(bpy.types.Operator):
 			
 			return {'FINISHED'}
 		
+		# CANCEL REGION #
+		elif event.type == 'ESC':
+			
+			bpy.context.window.cursor_set("DEFAULT")
+			
+			return {'FINISHED'}
 		
 		if(self.drawGL):
 			
