@@ -21,9 +21,9 @@
 bl_info = {
 	"name": "Offset Animation",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
-	"location": "Tools > Offset Animation",
+	"location": "Animation (Tools Panel) > Offset Animation",
 	"description": "Offset for animated object and bones",
 	"category": "Cenda Tools",
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
@@ -41,15 +41,13 @@ from math import *
 class OffsetAnimationPanel(bpy.types.Panel):
 	
 	
-	bl_label = "Offset Animation"
+	bl_label = "Offset"
 	bl_idname = "OFFSET_ANIMATION_PANEL"
 	
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "TOOLS"
-	bl_category = "Tools"
-#	bl_context = "posemode"
+	bl_category = "Animation"
 	
-
 	bpy.types.Scene.showSetOffset = BoolProperty(name="ShowSetOffset",default=False) # is reference setted?
 	bpy.types.Scene.autokeySetting = BoolProperty(name="AutoKey",default=True) # previous setting for autokey
 	
