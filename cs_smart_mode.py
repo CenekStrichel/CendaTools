@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Smart Mode Switcher",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 79, 0),
 	"location": "object.smart_mode command",
 	"description": "Smart switch between Object / Edit mode with change Properties",
@@ -35,14 +35,10 @@ import bpy
 from bpy.props import StringProperty #, IntProperty, BoolProperty, EnumProperty
 #from bpy.types import Header, Panel
 
-'''		
-class SmartModeVariables(bpy.types.PropertyGroup):
-	
-	bpy.types.Scene.PreviousPanel = bpy.props.StringProperty( name = "Previous Panel", default = "" )
-'''
 
 # change object mode by selection			
 class SmartObjectMode(bpy.types.Operator):
+
 
 	'''Smart Object Mode'''
 	bl_idname = "object.smart_mode"
@@ -55,15 +51,17 @@ class SmartObjectMode(bpy.types.Operator):
 		obj = context.active_object
 		print("Smart Mode Type: " + obj.type)
 		
-		#
+		########################################
+		# ARMATURE #
+		########################################
 		if(obj.type == "ARMATURE"):
 			
 			# try use my rig switcher
 			try:
 				if context.active_object.mode == 'OBJECT':
-					bpy.ops.cenda.pose()
+					bpy.ops.cenda.pose() # rig switcher
 				else:
-					bpy.ops.cenda.object()
+					bpy.ops.cenda.object() # rig switcher
 					
 			# else normal switch
 			except:
@@ -71,20 +69,31 @@ class SmartObjectMode(bpy.types.Operator):
 				
 			SetPropertiesPanel( 'DATA' )
 		
-		#	
+		########################################
+		# MESH #
+		########################################
 		elif(obj.type == "MESH"):
-			bpy.ops.object.editmode_toggle()
-		
-		#	
+			if context.active_object.mode == 'OBJECT':
+				bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+			else:
+				bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+				
+		########################################
+		# LATTICE & CURVE #
+		########################################
 		elif(obj.type == "LATTICE" or obj.type == "CURVE"):
 			bpy.ops.object.editmode_toggle()
 			SetPropertiesPanel( 'DATA' )
 			
-		#	
+		########################################	
+		# CAMERA & EMPTY & LAMP #
+		########################################
 		elif(obj.type == "CAMERA" or obj.type == "EMPTY" or obj.type == "LAMP"):
 			SetPropertiesPanel( 'DATA', onlyObjectMode = True )
 			
-		#
+		########################################	
+		# OTHERS #
+		########################################
 		else:
 			bpy.ops.object.editmode_toggle()
 			
@@ -98,29 +107,7 @@ def SetPropertiesPanel( panelName , onlyObjectMode = False ):
 		if area.type == 'PROPERTIES':
 			for space in area.spaces: # iterate through all founded panels
 				if space.type == 'PROPERTIES':
-
 					space.context = panelName
-					'''
-					pass
-				
-					# new is object mode
-					if(bpy.context.active_object.mode == "OBJECT" and not onlyObjectMode):
-						if( len(bpy.context.scene.PreviousPanel) > 0 ):	
-							space.context = bpy.context.scene.PreviousPanel
-						
-					# new is some edit mode
-					else:
-						if(not onlyObjectMode):
-							if(space.context != panelName):
-								bpy.context.scene.PreviousPanel = space.context
-								
-						space.context = panelName
-					'''
-			
-			
-	
-# wm.context_toggle	
-# bpy.context.tool_settings.use_uv_select_sync	
 
 				
 ################################################################
