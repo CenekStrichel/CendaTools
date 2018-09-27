@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Tools",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 5),
+	"version": (1, 0, 6),
 	"blender": (2, 79, 0),
 	"location": "Many commands",
 	"description": "Many tools",
@@ -36,7 +36,47 @@ from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty, F
 from bpy.types import Header, Panel
 
 
+# auto preview range for timeline and current keyframes
+class TimeAutoPreviewRangeSet(bpy.types.Operator):
 
+	bl_idname = "time.autopreviewrange_set"
+	bl_label = "Auto-Set Preview Range"
+
+	def execute(self, context):
+		
+		savedframe = bpy.context.scene.frame_current
+
+		TimelineAutoSetPreview( False )
+		TimelineAutoSetPreview( True )
+		TimelineAutoSetPreview( False ) # HACK
+
+		bpy.context.scene.frame_current = savedframe
+
+		return {'FINISHED'}
+	
+	
+def TimelineAutoSetPreview( nextFrame ):
+
+	counter = 10
+
+	while(True):
+
+		bpy.ops.screen.keyframe_jump( next = nextFrame )
+		
+		counter = counter - 1
+				
+		if(counter <= 0):
+			
+			bpy.context.scene.use_preview_range = True
+		
+			if(nextFrame):
+				bpy.context.scene.frame_preview_end = bpy.context.scene.frame_current
+			else:	
+				bpy.context.scene.frame_preview_start = bpy.context.scene.frame_current
+			
+			break
+			
+			
 ############################ GUI ####################################	
 # replace for classic camera view (NUM 0)		
 class ShowCameraView(bpy.types.Operator):
@@ -52,13 +92,14 @@ class ShowCameraView(bpy.types.Operator):
 		if(space.region_3d.view_perspective == 'CAMERA'):
 			space.show_only_render = False
 			space.show_manipulator = True
-			space.fx_settings.use_ssao  = False
+		#	space.fx_settings.use_ssao  = False
+			context.scene.camera.data.passepartout_alpha = 1
 
 		# CAMERA VIEW
 		else:
 			space.show_only_render = True
 			space.show_manipulator = False
-			space.fx_settings.use_ssao  = True
+		#	space.fx_settings.use_ssao  = True
 			
 		bpy.ops.view3d.viewnumpad(type = "CAMERA")
 
@@ -111,7 +152,28 @@ class AnimationPlayRestore(bpy.types.Operator):
 
 		return {'FINISHED'}
 	
+	
+# stop or rewind animation play	
+class AnimationStopRewind(bpy.types.Operator):
 
+	bl_idname = "screen.animation_stop_rewind"
+	bl_label = "Stop / Rewind Animation"
+	
+	
+	def execute(self, context):
+
+		# playing
+		isplaying = bpy.context.screen.is_animation_playing
+		
+		# stop / play					
+		if( isplaying ):
+			bpy.ops.screen.animation_cancel(restore_frame=False)
+		else:
+			bpy.ops.screen.frame_jump()
+	
+		return {'FINISHED'}
+	
+	
 # Hotkey for Outliner	
 class HideObjects(bpy.types.Operator):
 	
