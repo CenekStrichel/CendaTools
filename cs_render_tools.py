@@ -209,12 +209,22 @@ class RenderWithoutFileOutput(bpy.types.Operator):
 		# switch on nodes and get reference #
 		if(bpy.context.scene.use_nodes):
 
-			# disable all output
+			# cycle all nodes
 			for node in bpy.context.scene.node_tree.nodes:
+				
+				# node tree
 				if( node.type == "OUTPUT_FILE" ):
 					if(node.mute == False):	
 						context.scene.FileOutput += node.name + ";"	# saved all except disabled
 						node.mute = True
+						
+			# all node groups
+			for ng in bpy.data.node_groups:
+				for n in bpy.data.node_groups[ ng.name ].nodes:
+					if( n.type == "OUTPUT_FILE" ):
+						if(n.mute == False):	
+							context.scene.FileOutput += n.name + ";" # saved all except disabled
+							n.mute = True
 				
 		# rendering #
 		bpy.ops.render.render("INVOKE_DEFAULT", animation=False, write_still=False, use_viewport=False )
@@ -233,10 +243,21 @@ def render_handler(scene):
 			fileOutputs = bpy.context.scene.FileOutput.split(";")
 			
 			for f in fileOutputs:
+				
+				# cycle all nodes
 				for node in bpy.context.scene.node_tree.nodes:
+					
+					# node tree
 					if( node.type == "OUTPUT_FILE" ):
 						if(node.name == f):
 							node.mute = False
+							
+				# all node groups
+				for ng in bpy.data.node_groups:
+					for n in bpy.data.node_groups[ ng.name ].nodes:
+						if( n.type == "OUTPUT_FILE" ):
+							if(n.name == f):
+								n.mute = False
 									
 			bpy.context.scene.FileOutput = ""
 
