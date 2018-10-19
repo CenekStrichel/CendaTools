@@ -57,7 +57,7 @@ class BatchRender(bpy.types.Operator):
 			return {'FINISHED'}
 			
 		if( bpy.context.scene.camera == None ):
-			self.report({'ERROR'}, ("Set camera in Scene!") )
+			self.report({'ERROR'}, ("Set camera in Scene Settings!") )
 			return {'FINISHED'}
 			
 		# render command #
