@@ -88,6 +88,14 @@ class ShowCameraView(bpy.types.Operator):
 		
 		space = bpy.context.space_data
 		
+		if( bpy.context.scene.camera == None ):
+			self.report({'ERROR'}, ("Set camera in Scene Settings!") )
+			return {'FINISHED'}
+
+		space.lock_camera_and_layers = False # desync
+		space.camera = None # reset camera
+		bpy.ops.view3d.viewnumpad(type = "CAMERA")
+		
 		# Normal view
 		if(space.region_3d.view_perspective == 'CAMERA'):
 			space.show_only_render = False
@@ -100,8 +108,7 @@ class ShowCameraView(bpy.types.Operator):
 			space.show_only_render = True
 			space.show_manipulator = False
 		#	space.fx_settings.use_ssao  = True
-			
-		bpy.ops.view3d.viewnumpad(type = "CAMERA")
+		
 
 		return {'FINISHED'}
 	
