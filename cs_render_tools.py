@@ -23,7 +23,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"description": "Render Region & Render without file output",
 	"location": "Hotkey (commands)",
-	"version": (1, 0, 2),
+	"version": (1, 0, 3),
 	"blender": (2, 79, 0),
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
@@ -34,6 +34,7 @@ import bpy
 
 from bpy.app.handlers import persistent
 from bpy.props import StringProperty, IntProperty, BoolProperty
+from bpy.types import Header, Panel
 
 import bpy
 import bgl
@@ -262,14 +263,40 @@ def render_handler(scene):
 			bpy.context.scene.FileOutput = ""
 
 
+def RenderButtonEditor(self, context):
+	
+	layout = self.layout
+	row = layout.row(align=True)
+
+	row.operator( "render.render_without_fileoutput", text = "Render w/o Output", icon = "RENDER_STILL" )
+	
+	
+def RenderButtonCamera(self, context):
+	
+	space = bpy.context.space_data
+	
+	# Normal view
+	if(space.region_3d.view_perspective == 'CAMERA'): # only for camera
+	
+		layout = self.layout
+		
+		row = layout.row(align=True)
+		row.operator( "render.render_without_fileoutput", text = "Render w/o Output", icon = "RENDER_STILL" )
+	
+		
 ################################################################
 # register #
 def register():
 	bpy.utils.register_module(__name__)
 	bpy.app.handlers.render_post.append(render_handler)
+	bpy.types.IMAGE_HT_header.prepend(RenderButtonEditor)
+	bpy.types.VIEW3D_HT_header.prepend(RenderButtonCamera)
+	
 	
 def unregister():
 	bpy.utils.unregister_module(__name__)
+	bpy.types.IMAGE_HT_header(RenderButtonEditor)
+	bpy.types.VIEW3D_HT_header(RenderButtonCamera)
 	
 if __name__ == "__main__":
 	register()
