@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Offset Animation",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 4),
+	"version": (1, 0, 5),
 	"blender": (2, 79, 0),
 	"location": "Animation (Tools Panel) > Offset Animation",
 	"description": "Offset for animated object and bones",
@@ -284,48 +284,52 @@ def OffsetAnimation( locDifference, rotDifference, qRotDifference, sclDifference
 			# BONE #
 			###################################################
 			if(bpy.context.active_pose_bone != None):
-
-				# find bone by name
-				if( (bonePose.name) == ( str(fcurveDataPath).split("\"")[1] ) ):
-			
-					# LOCATION # - TODO - Rewrite duplicity code
-					if ( ".location" in fcurveDataPath ):
+				
+				try:
+					# find bone by name
+					if( (bonePose.name) == ( str(fcurveDataPath).split("\"")[1] ) ):
+				
+						# LOCATION # - TODO - Rewrite duplicity code
+						if ( ".location" in fcurveDataPath ):
+							
+							numKeyframes = len( action.fcurves[ i ].keyframe_points )
+							offset = locDifference[ locIndex ]
+							locIndex += 1
+							
+							CurveOffset(action, i, offset, numKeyframes)
 						
-						numKeyframes = len( action.fcurves[ i ].keyframe_points )
-						offset = locDifference[ locIndex ]
-						locIndex += 1
 						
-						CurveOffset(action, i, offset, numKeyframes)
-					
-					
-					# ROTATION #
-					elif ( ".rotation_euler" in fcurveDataPath ):
+						# ROTATION #
+						elif ( ".rotation_euler" in fcurveDataPath ):
 
-						numKeyframes = len( action.fcurves[ i ].keyframe_points )
-						offset = rotDifference[ rotIndex ]
-						rotIndex += 1
-	
-						CurveOffset(action, i, offset, numKeyframes)
+							numKeyframes = len( action.fcurves[ i ].keyframe_points )
+							offset = rotDifference[ rotIndex ]
+							rotIndex += 1
+		
+							CurveOffset(action, i, offset, numKeyframes)
 
 
-					# Q ROTATION #
-					elif ( ".rotation_quaternion" in fcurveDataPath ):
+						# Q ROTATION #
+						elif ( ".rotation_quaternion" in fcurveDataPath ):
 
-						numKeyframes = len( action.fcurves[ i ].keyframe_points )
-						offset = qRotDifference[ rotQIndex ]
-						rotQIndex += 1
+							numKeyframes = len( action.fcurves[ i ].keyframe_points )
+							offset = qRotDifference[ rotQIndex ]
+							rotQIndex += 1
 
-						CurveOffset(action, i, offset, numKeyframes)
+							CurveOffset(action, i, offset, numKeyframes)
+								
+								
+						# SCALE #
+						elif ( ".scale" in fcurveDataPath ):
+								
+							numKeyframes = len( action.fcurves[ i ].keyframe_points )
+							offset = sclDifference[ sclIndex ]
+							sclIndex += 1
+
+							CurveOffset(action, i, offset, numKeyframes)
 							
-							
-					# SCALE #
-					elif ( ".scale" in fcurveDataPath ):
-							
-						numKeyframes = len( action.fcurves[ i ].keyframe_points )
-						offset = sclDifference[ sclIndex ]
-						sclIndex += 1
-
-						CurveOffset(action, i, offset, numKeyframes)
+				except:			
+					print("Can not find data path: " + str(fcurveDataPath) )
 
 
 	
