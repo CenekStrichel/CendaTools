@@ -24,7 +24,7 @@ bl_info = {
 	"author": "Cenek Strichel",
 	"description": "Switching between Riggigng modes",
 	"location": "Add to Input: wm.call_menu + VIEW3D_MT_rig_switcher_menu & Armature Setting: Rig Switcher Settings",
-	"version": (1, 0, 3),
+	"version": (1, 0, 4),
 	"blender": (2, 79, 0),
 	"wiki_url": "https://github.com/CenekStrichel/CendaTools/wiki",
 	"tracker_url": "https://github.com/CenekStrichel/CendaTools/issues"
@@ -277,7 +277,9 @@ class ObjectMode(bpy.types.Operator):
 		
 		if(self.selectHierarchy):
 			bpy.ops.object.select_grouped(extend=True, type='CHILDREN_RECURSIVE')
-
+			
+		SetModeChild( "OBJECT", True )
+		
 		return {'FINISHED'}
 	
 	
@@ -306,6 +308,8 @@ class EditMode(bpy.types.Operator):
 			obj.draw_type = 'SOLID'
 		else:
 			obj.draw_type = 'WIRE'
+			
+		SetModeChild( "OBJECT", True )
 		
 		return {'FINISHED'}
 
@@ -330,11 +334,13 @@ class WeightMode(bpy.types.Operator):
 		SetBoneSettings( "STICK", True, False, False, False )
 
 		bpy.ops.object.mode_set(mode='POSE')
-		bpy.context.space_data.viewport_shade = 'SOLID'
-
-		return {'FINISHED'}    
-
-
+#		bpy.context.space_data.viewport_shade = 'SOLID'
+		
+		SetModeChild( "WEIGHT_PAINT", False )
+		
+		return {'FINISHED'}  
+	
+	  
 class PoseMode(bpy.types.Operator):
 
 	"""Pose Mode for Animation"""
@@ -353,8 +359,9 @@ class PoseMode(bpy.types.Operator):
 
 		SetArmatureLayer( obj.PoseModeIndexLayer )
 		SetBoneSettings( "STICK" if obj.Stick else 'OCTAHEDRAL', obj.XRay, False, False, True )		
-		
+
 		bpy.ops.object.mode_set(mode='POSE')
+#		bpy.context.space_data.viewport_shade = 'MATERIAL'
 		
 		# solid or wire by setting
 		if(obj.SolidDraw):
@@ -367,6 +374,8 @@ class PoseMode(bpy.types.Operator):
 			child.show_all_edges = False
 			child.show_wire = False
 			
+		SetModeChild( "OBJECT", True )	
+		
 		return {'FINISHED'}
 
 
@@ -396,6 +405,8 @@ class ParentMode(bpy.types.Operator):
 		for child in bpy.context.active_object.children :
 			child.show_all_edges = False
 			child.show_wire = False
+			
+		SetModeChild( "OBJECT", True )
 			
 		return {'FINISHED'}
 	
@@ -505,7 +516,22 @@ False, False, False, False, False, False, False, False ]
 	
 	bpy.types.Object.SolidDrawEdit = bpy.props.BoolProperty( name = "Solid Draw with Edit Mode", description = "", default = False )
 
+
 ## HELPERS ########################################################################################
+def SetModeChild( modeType, previousActive = True):
+
+	previousSaved = bpy.context.active_object
+
+	# set weight
+	for child in bpy.context.active_object.children :	
+	
+		bpy.context.scene.objects.active = child
+		bpy.ops.object.mode_set( mode=modeType )
+		
+	if(previousActive):
+		bpy.context.scene.objects.active = previousSaved
+			
+			
 def SetBoneSettings( drawType = "OCTAHEDRAL", show_x_ray = False, show_axes = False, show_names = False, show_bone_custom_shapes = False ):
 	
 	bpy.context.object.data.draw_type = drawType
@@ -519,12 +545,12 @@ def DeselectableAllMeshes( state = True ):
 	
 	SelectableRecursive( bpy.context.active_object, state )
 		
-				
+			
 def SelectableRecursive(ob, state):
 	
     # armature is active
 	for child in ob.children :
-		
+	
 		####################################
 		child.hide_select = state
 		
