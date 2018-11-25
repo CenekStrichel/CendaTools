@@ -296,7 +296,7 @@ class ExportToPlace(bpy.types.Operator):
 				check_existing = True,
 				axis_forward = '-Z',
 				axis_up = 'Y',
-				version = 'BIN7400',
+			#	version = 'BIN7400',
 
 				use_selection = True,
 				global_scale = 1.0,
@@ -326,12 +326,12 @@ class ExportToPlace(bpy.types.Operator):
 				bake_anim_step = 1.0,
 				bake_anim_simplify_factor = context.scene.Simplify,
 
-				use_anim = True,
-				use_anim_action_all = True,
-				use_default_take = True,
-				use_anim_optimize = True,
-
-				anim_optimize_precision = 6.0,
+			#	use_anim = True,
+			#	use_anim_action_all = True,
+			#	use_default_take = True,
+			#	use_anim_optimize = True,
+			#	anim_optimize_precision = 6.0,
+			
 				path_mode = 'AUTO',
 				embed_textures = False,
 				batch_mode = 'OFF',
