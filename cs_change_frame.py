@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Change Frame",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 3),
+	"version": (1, 0, 4),
 	"blender": (2, 79, 0),
 	"location": "Add 'view3d.change_frame_drag' to Input Preferences under 3D View (Global)",
 	"description": "Change frame by dragging",
@@ -33,7 +33,7 @@ bl_info = {
 
 import bpy
 from bpy.props import IntProperty, FloatProperty, BoolProperty, EnumProperty
-
+from bpy.types import AddonPreferences, Operator
 
 class ChangeFrame(bpy.types.Operator):
 	
@@ -66,6 +66,9 @@ class ChangeFrame(bpy.types.Operator):
 
 	def modal(self, context, event):
 	
+		user_preferences = context.user_preferences
+		addon_prefs = user_preferences.addons[__name__].preferences
+	
 		# set mouse up button
 		mouseEnd = ''
 		if(self.mouseSetting == 'LeftMouse'):
@@ -82,9 +85,15 @@ class ChangeFrame(bpy.types.Operator):
 		if event.type == 'MOUSEMOVE':
 			
 			delta = self.mouseOffset - event.mouse_x
-			bpy.context.scene.frame_current = (-delta * self.sensitivity) + self.frameOffset
-
-
+			
+			if( addon_prefs.boolSmoothDrag ):
+				off = (-delta * self.sensitivity) + self.frameOffset
+				bpy.context.scene.frame_current = int(off)
+				bpy.context.scene.frame_subframe = off-int(off)
+				
+			else:
+				bpy.context.scene.frame_current = (-delta * self.sensitivity) + self.frameOffset
+				
 		# end of modal
 		elif event.type == mouseEnd and event.value == 'RELEASE':
 			
@@ -97,12 +106,19 @@ class ChangeFrame(bpy.types.Operator):
 			# cursor back
 			bpy.context.window.cursor_set("DEFAULT")
 			
+			# snap back
+			if( addon_prefs.boolSmoothSnap ):
+				bpy.context.scene.frame_subframe = 0
+			
 			return {'FINISHED'}
 			
 		return {'RUNNING_MODAL'}
 
 
 	def invoke(self, context, event):
+		
+		user_preferences = context.user_preferences
+		addon_prefs = user_preferences.addons[__name__].preferences
 		
 		# hide viewport helpers
 		self.previousManipulator = bpy.context.space_data.show_manipulator
@@ -114,7 +130,11 @@ class ChangeFrame(bpy.types.Operator):
 		
 		
 		# start modal
-		self.frameOffset = bpy.context.scene.frame_current 
+		if( addon_prefs.boolSmoothDrag ):
+			self.frameOffset = bpy.context.scene.frame_current_final
+		else:
+			self.frameOffset = bpy.context.scene.frame_current 
+			
 		self.mouseOffset = event.mouse_x
 		
 		# cursor
@@ -148,6 +168,24 @@ class ChangeFrame(bpy.types.Operator):
 		return {'RUNNING_MODAL'}
 
 
+class ChangeFrameDragAddonPreferences(AddonPreferences):
+
+	bl_idname = __name__
+
+	boolSmoothDrag = BoolProperty( name="Smooth Drag",default=True )
+	boolSmoothSnap = BoolProperty( name="Snap after drag",default=True )
+	
+	def draw(self, context):
+	
+		layout = self.layout
+		
+		layout.prop(self, "boolSmoothDrag")
+		
+		if(self.boolSmoothDrag):
+			layout.prop(self, "boolSmoothSnap")
+
+		
+		
 ###########################################################
 def register():
 	bpy.utils.register_module(__name__)
