@@ -21,7 +21,7 @@
 bl_info = {
 	"name": "Batch Render",
 	"author": "Cenek Strichel",
-	"version": (1, 0, 1),
+	"version": (1, 0, 2),
 	"blender": (2, 7, 9),
 	"location": "Render > BATs commands",
 	"description": "Create BAT file for easy rendering",
@@ -33,6 +33,7 @@ bl_info = {
 
 import bpy
 import os
+import glob
 
 from platform import system as currentOS
 from bpy.types import Header, Menu
@@ -101,6 +102,56 @@ class BatchRender(bpy.types.Operator):
 		return {'FINISHED'}
 
 
+class MergeBatch(bpy.types.Operator):
+
+	'''Merge BAT files'''
+	bl_idname = "screen.batch_render_merge"
+	bl_label = "Merge BAT files"
+	bl_options = {'REGISTER'}
+	
+
+	def execute(self, context):
+		
+		filepath = bpy.data.filepath
+		relpath = bpy.path.relpath(filepath)
+		path = filepath[0: -1 * (relpath.__len__() - 2)]
+		
+		output = "RENDER_MERGE.bat" # merged bat name
+		
+		os.chdir(path)
+	
+		# delete previous Merge file
+		if( os.path.exists(output) ):
+			os.remove(output)
+
+		o = open( str(output) , "a" )
+
+		for files in glob.glob("*.bat"):
+			if( files == output ): # skip Render_merge file is exist
+				continue
+				
+			pathBat = path + files
+			i = open( pathBat )
+				
+			while True:
+				
+				line = i.readline() # line from bat
+				
+				if len(line) == 0: # no new line means end
+					break # EOF
+					
+				o.write(str(line)) # write to file
+				
+			o.write("\n\n")
+
+			i.close()
+			
+		o.write("del \"" + str(path) + str(output) +"\"" )		
+		o.close()
+
+		return {'FINISHED'}
+		
+	
 def menu_func(self, context):
 	
 	self.layout.separator()
@@ -119,6 +170,9 @@ def menu_func(self, context):
 	op.shutdown = False
 	op.range = True
 	
+	self.layout.separator()
+	
+	self.layout.operator( "screen.batch_render_merge", icon="AUTOMERGE_OFF", text = "BAT Merge" )
 	
 ################################################################
 # register #
