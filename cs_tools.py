@@ -686,6 +686,8 @@ class SwitchWeight(bpy.types.Operator):
 
 	def execute(self, context):
 		
+		bpy.context.scene.tool_settings.unified_paint_settings.use_unified_weight = True
+
 		# show all
 		if(bpy.context.scene.tool_settings.unified_paint_settings.weight == 0):
 			bpy.context.scene.tool_settings.unified_paint_settings.weight = 1
